@@ -1,0 +1,88 @@
+\documentclass{article}
+\usepackage[a4paper, tmargin=1in, bmargin=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage{pdflscape}
+\usepackage{listings}
+\usepackage{hyperref}
+
+
+\newcommand{\ra}{$\rightarrow$}
+
+
+\title{EE 344 Project Proposal - Visible Light Communication using LED}
+\author{
+Arka Sadhu - 140070011\\
+Sudeep Salgia - 14D070011\\
+Parth Kothari - 14D070019\\
+}
+\date{November 2016}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\section{Abstract}
+We aim to develop a prototype of Visible Light Based Communication link. The project will consist of a transmitter, a LED in this case, which will transmit the message signal which will be received by the receiver. The received signal will then be burnt on a SD card.
+
+\section{Project Description}
+
+\subsection{Background and Motivation}
+LiFi (Light Fidelity) is the new buzzword in new era of communication. Electronic Design Lab is giving us a great opportunity to explore this domain and  all of us are enthusiastic to work on it , thus motivating us to take up this topic.
+
+\subsection{Project Goal}
+Our project aims to achieve the the following objectives in order to make a satisfactory prototype.
+\begin{itemize}
+\item Should transmit a file stored in a USB/SD card
+\item Transmission speed should be 1 Mb/s
+\item Blinking should not be detected by the naked eye
+\item Link should work over a distance of 40 cm
+\end{itemize}
+\subsection{Project Specifications}
+
+\section{Technical Design Description}
+\subsection{Possible Solutions and Design Alternatives}
+
+\subsection{System-level overview}
+
+\section{Project Plan}
+Tasks to be done:
+\begin{itemize}
+\item Reading Literature \ra We will read a few papers regarding the implementation done by various researchers and institute. After reading them, we hope to achieve a DEEEEEEP understanding of the logistics behind the working of visible light communication. (2 weeks)
+\item Designing the Transmitter \ra As mentioned above, we will be using an LED to transmit the message. The circuit will be designed with proper biasing for efficient transmission (1 week)
+\item Designing the Receiver\ra This is relatively the tough part of the circuit. Along with proper biasing, effects of surrounding light need to be taken care of and finally clock synchronization  and frequency offset problem will be tackled (3 weeks)
+\item DSP Board Coding \ra  Code for the acquisition of signal, processing of signal and writing on the computer will be written on the DSP board. (1 week)
+\item Integration and Testing\ra  After satisfactory implementation of individual components of the main circuit, they will be integrated and tested starting from lower speeds (10 kbps), problems will be identified and subsequently rectified. Finally, we aim to achieve the desired  speed of 1 Mbps. ( 3 weeks)
+\item Buffer\ra  1 week will be kept buffer to improve the efficiency of the system and tackle last minute debugging issues.
+\end{itemize}
+\subsection{Work distribution}
+\subsection{Gantt chart}
+
+\section{Project Implementation}
+
+\section{Deliverables}
+\begin{itemize}
+\item By first week of February, we hope to get done with
+  \begin{itemize}
+  \item Understanding Literature
+  \item Procurement of Components
+  \item Finishing the Transmitter Circuit
+  \item Getting Started with the Receiver 
+  \end{itemize}
+
+\item By second week of March, we hope to accomplish
+
+  \begin{itemize}
+  \item Finish Tackling the Problem of Clock Synchronization and Frequency offset
+  \item Start integrating the components.
+  \end{itemize}
+
+\item By first week of April, we hope to accomplish
+  \begin{itemize}
+  \item After second evaluation, we get started with testing of the circuit. We will start off with 10 kbps, correct the errors which come in the way and in the end   hope to get the desired speed of 1Mbps. 
+  \end{itemize}
+\end{itemize}
+
+\end{document}
+
