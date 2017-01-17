@@ -23,33 +23,69 @@ Parth Kothari - 14D070019\\
 \maketitle
 
 \tableofcontents
+\newpage
 \section{Abstract}
-We aim to develop a prototype of Visible Light Based Communication link. The project will consist of a transmitter, a LED in this case, which will transmit the message signal which will be received by the receiver. The received signal will then be burnt on a SD card.
+% Five to ten sentences providing a non-technical description; use technical words only to describe important specifications. Describe the “big picture” of the project.
+LiFi (Light Fidelity) is the new buzzword in new era of communication. It is often used to describe high speed Visible Light Communication (VLC). VLC dedicates itself to solving the problem of illumination and communication together. The way it is implemented is that the light source is switched on and off at a very high speed, such that it is not discernible to the human eye, but a sensitive photodiode can detect it. This solves the problem of illumination and at the same we can encode information in the switching pattern and hence enabling us to transmit data, and recover it using the photodiode receiver.
+
+In our project, we aim to develop a prototype of Visible Light Based Communication link. The project will consist of a transmitter, a LED in this case, which will transmit the message signal which will be received by the receiver. The Transmitter will transmit a file preloaded on a USB/SD card and this will be captured by receiver. 
 
 \section{Project Description}
-
 \subsection{Background and Motivation}
-LiFi (Light Fidelity) is the new buzzword in new era of communication. Electronic Design Lab is giving us a great opportunity to explore this domain and  all of us are enthusiastic to work on it , thus motivating us to take up this topic.
+% related to your work, what others have done with current limitations, references, literature survey, or what is the pain in the current scenario.
+% Electronic Design Lab is giving us a great opportunity to explore this domain and  all of us are enthusiastic to work on it , thus motivating us to take up this topic.
+% ********************************************************************
+% copied from : http://www.vlcc.net/modules/xpage0/?ml_lang=en
+% **************** Need to edit regarding what is the pain in the current scenario**************************************
+Visible Light Communication is the most advanced communication technology using "Visible Light"; the visible light everywhere around our daily life. We are heavily relying on our eyes to gather almost all information for our day-to-day activities. "Visibility" is one of the most important things for human being, and many devices are developed to assist our "Visibility". 
+
+For instance, there are many devices including the lightings in our offices, home, the lightings on roads, traffic signals, commercial displays, small lamps on electronic home appliances including TVs, etc. 
+
+Recently, LED (Light Emitting Diode) has been used for those devices. LED has a special characteristic to light on and off very fast. The data can be transmitted by lighting LED on and off at ultra high speed. And, the digital camera and the camera on cell phones, which are popular now, are very excellent system to receive the visible light. 
+
+By using the visible light for the data transmission, many problems related to radio and infrared communications are solved. The visible light communication has characteristics to be ubiquitous, transmitted at ultra high speed and harmless for human body and electronic devices, compared to those by radio and infrared communications.
+
+We wish to explore the possibilities laid down by VLC. In particular we want to evaluate the capacity of LEDs to transmit data at relatively high speed and over a short range. 
 
 \subsection{Project Goal}
-Our project aims to achieve the the following objectives in order to make a satisfactory prototype.
+% summarize what your design project is to achieve. It can be   general and non-technical but should describe “the big picture” elaborately. Basically, you briefly explain what the solution is and what is unique about your solution.
+
+Our project aims to achieve the the following objectives in order to make a satisfactory prototype (as given in the project statement)
+% Need to explain what is UNIQUE ABOUT OUR SOLUTION
 \begin{itemize}
 \item Should transmit a file stored in a USB/SD card
 \item Transmission speed should be 1 Mb/s
 \item Blinking should not be detected by the naked eye
-\item Link should work over a distance of 40 cm
+\item Link should work over a distance of 1 m.
 \end{itemize}
+
 \subsection{Project Specifications}
+\begin{itemize}
+\item Customer Specifications:
+  \begin{itemize}
+  \item                         %KYA hi likhu isme???
+  \end{itemize}
+\item Technical Specifications: 
+  \begin{itemize}
+  \item %KYA hi likhu isme???
+  \end{itemize}
+\end{itemize}
 
 \section{Technical Design Description}
 \subsection{Possible Solutions and Design Alternatives}
-
+% In this section describe the possible solutions and evaluate them in terms their possible performance, availability of the resources, and other limitations. State the solution you would like to adopt with justification.
 \subsection{System-level overview}
-
+% Include a block diagram with functional description. A brief overview of what   your proposed device/solution is and how it will work. Include figures to illustrate the concept of your final product showing what it will look like, showing how it will work, and showing what it will do. 
+\subsection{Performance Validation}
+% Describe how you would validate your final design and prove that it meets the specifications you promised. You would demonstrate your successful project at the final Design Lab Demo.
 \section{Project Plan}
+%This section is to provide 
+% A listing of all tasks, planning, involving all the tasks and sub-tasks. A task can be defined as anything that takes your time.
+% Examples of tasks possible are (but not limited to):  Embedded system design, sensor testing, analog module design and testing, mechanical design, PCB    design, power consumption estimation, components procurement, documentation, etc.
+
 Tasks to be done:
 \begin{itemize}
-\item Reading Literature \ra We will read a few papers regarding the implementation done by various researchers and institute. After reading them, we hope to achieve a DEEEEEEP understanding of the logistics behind the working of visible light communication. (2 weeks)
+\item Reading Literature \ra We will read a few papers regarding the implementation done by various researchers and institute. After reading them, we hope to achieve a deep understanding of the logistics behind the working of visible light communication. (2 weeks)
 \item Designing the Transmitter \ra As mentioned above, we will be using an LED to transmit the message. The circuit will be designed with proper biasing for efficient transmission (1 week)
 \item Designing the Receiver\ra This is relatively the tough part of the circuit. Along with proper biasing, effects of surrounding light need to be taken care of and finally clock synchronization  and frequency offset problem will be tackled (3 weeks)
 \item DSP Board Coding \ra  Code for the acquisition of signal, processing of signal and writing on the computer will be written on the DSP board. (1 week)
@@ -58,10 +94,15 @@ Tasks to be done:
 \end{itemize}
 \subsection{Work distribution}
 \subsection{Gantt chart}
+% Time line for execution including team members associated with each task   you have planned – A Gantt chart can be used for the purpose.
 
 \section{Project Implementation}
+% At this stage, you need to submit a BOM (Bill of Materials). Apart from the components decide your testing strategy - how to test, needed tools, precautions and feasibility Assessment (resources, risks).  What is the deliverable of the work and demo possible in reality?
 
 \section{Deliverables}
+% Spell out the project deliverables - what you would demonstrate during the evaluations
+% (It is expected that for the first evaluation (1st week of Feb) roughly 30% of work is ready. You will have to demonstrate the subsystems that are ready. For the second evaluation (2nd week of March) 60 to 80% of your work should be over and you should be working on your final PCB, box etc. We expect a draft version of your final report submitted by the 1st week of April. For the final evaluation (April 10-14) you need to give a brief presentation (20 min) and a demo of your project.)
+
 \begin{itemize}
 \item By first week of February, we hope to get done with
   \begin{itemize}
