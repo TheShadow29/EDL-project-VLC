@@ -50,24 +50,26 @@ We wish to explore the possibilities laid down by VLC. In particular we want to 
 \subsection{Project Goal}
 % summarize what your design project is to achieve. It can be   general and non-technical but should describe “the big picture” elaborately. Basically, you briefly explain what the solution is and what is unique about your solution.
 
-Our project aims to achieve the the following objectives in order to make a satisfactory prototype (as given in the project statement)
-% Need to explain what is UNIQUE ABOUT OUR SOLUTION
+Our project aims to achieve the the following objectives in order to make a satisfactory prototype
 \begin{itemize}
-\item Should transmit a file stored in a USB/SD card
 \item Transmission speed should be 1 Mb/s
 \item Blinking should not be detected by the naked eye
-\item Link should work over a distance of 1 m.
+\item Link should work over a distance of 50 cm
+\item Should transmit a file stored in a USB/SD card 
 \end{itemize}
 
 \subsection{Project Specifications}
 \begin{itemize}
-\item Customer Specifications:
+\item Customer Specifications: The following specifications will guarantee a finished product for consumer use
   \begin{itemize}
-  \item                         %KYA hi likhu isme???
+  \item Efficient, reliable and accurate transmission of the data at desired high speeds.
+  \item Availability of ambient light, along with the simultaneous data transmission from the LEDs. Also, care will be taken that the flickering of the LEDs would be indiscernible, without compromising much on the illumination.  
   \end{itemize}
 \item Technical Specifications: 
   \begin{itemize}
-  \item %KYA hi likhu isme???
+  \item Data Rate : The speed with which data can be transmitted from one device to another. (Transmitter to Receiver in this case). Our initial aim is to achieve a data rate of 1 Kbps and then increase and finally reach the desired speed of 1 Mbps.
+  \item Bit Error Rate : It is the number of bit errors is the number of received bits of a data stream over a communication channel that have been altered due to noise, interference, distortion or bit synchronization errors. It is given by the formula, in On-Off Keying Modulation Scheme, as $$\textrm{OOK} : \textrm{BER} = \mathcal{N}(\sqrt{\textrm{SNR}})$$ We hope to achieve a BER of $10^{-4}$ and reduce it further if possible.
+  \item Distance : We hope to achieve accurate data transmission upto a distance of 50 cm. If       we are done with the above objectives, we hope to increase the distance till 100 cm.  
   \end{itemize}
 \end{itemize}
 
@@ -75,9 +77,27 @@ Our project aims to achieve the the following objectives in order to make a sati
 \subsection{Possible Solutions and Design Alternatives}
 % In this section describe the possible solutions and evaluate them in terms their possible performance, availability of the resources, and other limitations. State the solution you would like to adopt with justification.
 \subsection{System-level overview}
-% Include a block diagram with functional description. A brief overview of what   your proposed device/solution is and how it will work. Include figures to illustrate the concept of your final product showing what it will look like, showing how it will work, and showing what it will do. 
+% Include a block diagram with functional description. A brief overview of what   your proposed device/solution is and how it will work. Include figures to illustrate the concept of your final product showing what it will look like, showing how it will work, and showing what it will do.
+The following is the step-by-step description of the entire system right from acquisition of the data to its reception in a file on the computer.
+\begin{itemize}
+\item Data Input - The data will be first acquired by the microcontroller from the SD card. 
+% \item Encoding - The Input Data will then be encoded using Hoffman Encoding (CHECK) to reduce the number of bits to transmit
+\item Modulation - The encoded data will then be modulated and thus converted to a form which can be transmitted through the optical Channel via the LEDs (the Transmitter).
+\item Channel - In visible light communication, it is pretty obvious that the data will be transmitted through an optical channel. Errors may arise due to interferences amongst symbols, or addition of noise or multipath fading
+\item Frequency Offset Correction and Clock Synchronisation at the Receiver- The receiver will be more complicated in design than the transmitter because of this feature. Appropriate circuitry will be designed to correct the frequency offset and synchronise the clocks
+\item Demodulation - Once the point mentioned above (5), gets implemented correctly, the modulated data will be demodulated to recover the encoded data
+\item Decoding - The encoded data will be decoded to retrieve the original data intended to be sent
+\item Saving the data - Finally the data which is received will then be saved in a file on the computer
+\end{itemize}
+
 \subsection{Performance Validation}
 % Describe how you would validate your final design and prove that it meets the specifications you promised. You would demonstrate your successful project at the final Design Lab Demo.
+The following measures will be noted will be used to values our performance by keeping a distance of 50 cm between the LED and the receiver:
+\begin{itemize}
+\item Time required to transmit given data from the LED to the receiver and thus the Data Rate
+\item The Bit Error Rate (BER) - By comparing the input file with the received file
+\end{itemize}
+
 \section{Project Plan}
 %This section is to provide 
 % A listing of all tasks, planning, involving all the tasks and sub-tasks. A task can be defined as anything that takes your time.
@@ -85,12 +105,13 @@ Our project aims to achieve the the following objectives in order to make a sati
 
 Tasks to be done:
 \begin{itemize}
-\item Reading Literature \ra We will read a few papers regarding the implementation done by various researchers and institute. After reading them, we hope to achieve a deep understanding of the logistics behind the working of visible light communication. (2 weeks)
-\item Designing the Transmitter \ra As mentioned above, we will be using an LED to transmit the message. The circuit will be designed with proper biasing for efficient transmission (1 week)
-\item Designing the Receiver\ra This is relatively the tough part of the circuit. Along with proper biasing, effects of surrounding light need to be taken care of and finally clock synchronization  and frequency offset problem will be tackled (3 weeks)
-\item DSP Board Coding \ra  Code for the acquisition of signal, processing of signal and writing on the computer will be written on the DSP board. (1 week)
-\item Integration and Testing\ra  After satisfactory implementation of individual components of the main circuit, they will be integrated and tested starting from lower speeds (10 kbps), problems will be identified and subsequently rectified. Finally, we aim to achieve the desired  speed of 1 Mbps. ( 3 weeks)
-\item Buffer\ra  1 week will be kept buffer to improve the efficiency of the system and tackle last minute debugging issues.
+\item Reading Literature :  We would need to go through a basic survey regarding the basics of visible light communication, corresponding hardware, modulation techniques with pros and cons of each of them, and hence come with a viable solution incorporating the all the factors and the feasibility given the availability of components and time constraints. The sources mainly comprise a number of papers and the few books in the field
+\item Circuit design :  Broadly speaking there would be two main parts to this, the transmitting circuit and the reception circuit. The transmission circuit would mainly involve the LED, a biasing circuit, and a switching circuit to generate the bit pattern amongst other basic elements. The reception circuit, which is relatively more difficult would mainly involve a photodetector,a circuit to nullify the ambient DC value and related basic elements.
+\item Generation of bit stream :  Another task is about taking a file and converting it into a bit stream which can be used to drive or feed the switching circuit. The main part is first to get a serial output of the bit pattern of the file and then modulate the signal according to the modulation scheme chosen initially. There a number of things that can be carried out in addition to the basic process outlined here which have been described later in the possible solutions section.
+\item Software implementation : This mainly would pertain to optimization of the implementation of the modulation scheme, error rate checking and correction and most importantly clock recovery and frequency offset correction hence synchronisation to improve the performance and the throughput of the system. This would mainly be done using a DSP board.
+\item PCB  design : The design and development of a PCB for circuits of both the ends.
+\item Integration and debugging:  The individual components would need to be debugged at all the stages and the all these components would need to be integrated to form a complete working system involving the debugging of the system after arranging them and finally packaging them.
+
 \end{itemize}
 \subsection{Work distribution}
 \subsection{Gantt chart}
@@ -124,6 +145,7 @@ Tasks to be done:
   \item After second evaluation, we get started with testing of the circuit. We will start off with 10 kbps, correct the errors which come in the way and in the end   hope to get the desired speed of 1Mbps. 
   \end{itemize}
 \end{itemize}
+
 
 \end{document}
 
