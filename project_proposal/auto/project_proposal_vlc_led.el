@@ -23,7 +23,8 @@
     "parskip"
     "pdflscape"
     "listings"
-    "hyperref")
+    "hyperref"
+    "titlesec")
    (TeX-add-symbols
     "ra"))
  :latex)
