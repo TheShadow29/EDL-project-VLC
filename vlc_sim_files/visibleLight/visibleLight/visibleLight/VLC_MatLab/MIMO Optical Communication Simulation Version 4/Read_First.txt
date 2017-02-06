@@ -1,0 +1,11 @@
+start with file " Display.m "
+
+Step 1:
+On the left bottom corner of the GUI, select "0" or "1" to be transmitted 
+for all the four LEDs..
+You MUST still click the dropdown list and select "0" even if the default 
+displayed is "0". 
+
+Do not click any slider bar before Step 1. It won't work.
+
+coded by Xiao Long (University of Cambridge) and LC Png (Nanyang Technological University)
