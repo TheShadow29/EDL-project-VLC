@@ -74,36 +74,7 @@ void UARTIntHandler()
         SysCtlDelay(SysCtlClockGet() / (1000 * 3)); //delay ~1 msec
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, 0); //turn off LED
     }
-    convert_uint_to_bin(i);
-}
-
-void convert_uint_to_bin(int num)
-{
-//    Note that the transmission is LSB -> MSB
-    int i = 0;
-//    int j = 0;
-    for(i = 0; i < num; i++)
-    {
-        uint8_t ch = character_get[i];
-        int j = 0;
-        for(j = 0; j < 8; j++)
-        {
-            uint8_t b = ch%2;
-            send_bin(b);
-            ch = ch/2;
-        }
-    }
-}
-
-
-void send_bin(uint8_t bin)
-{
-    GPIOPinWrite(GPIO_PORTF_BASE,GPIO_PIN_0,bin);
-}
-
-void send_bin_with_modulation(uint8_t bin)
-{
-
+//    convert_uint_to_bin(i);
 }
 
 
