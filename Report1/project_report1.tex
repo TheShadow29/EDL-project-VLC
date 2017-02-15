@@ -5,40 +5,70 @@
 \usepackage{parskip}
 \usepackage{pdflscape}
 \usepackage{listings}
+% \usepackage{float}
 %\usepackage{hyperref}
 %\usepackage{titlesec}
 
 \newcommand{\ra}{$\rightarrow$}
 
 
-\title{EE 344 Project Proposal \\ Visible Light Communication using LED}
-\author{
-  Arka Sadhu - 140070011\\
-  Sudeep Salgia - 14D070011\\
-  Parth Kothari - 14D070019\\
-}
-\date{January 2017}
+% \title{\vspace{-4.0cm} EE 344 Project Proposal \\ Visible Light Communication using LED}
+% \author{
+%   Group No. B-05\\
+%   Faculty Incharge: Prof. Kumar Appaiah\\
+%   Arka Sadhu - 140070011\\
+%   Sudeep Salgia - 14D070011\\
+%   Parth Kothari - 14D070019\\
+% }
+
+% \date{\today}
 
 \begin{document}
-%\maketitle
+% \maketitle
 
-% \tableofcontents
-% \newpage
+EE 344 Project Report 1 : Visible Light Communication using LED\\
+Group No. B-05\\
+Faculty Incharge: Prof. Kumar Appaiah\\
+% Group Members:\\
+Arka Sadhu - 140070011\\
+Sudeep Salgia - 14D070011\\
+Parth Kothari - 14D070019\\
+% \hline
+\vspace{-1.0cm}
+
+\section{Work Promised}
+
+\begin{itemize}
+\item Understanding the literature
+% \item Procurement of components : The SD card reader is yet to arrive. We have placed an order for the same.
+\item Finishing the transmitter ciruit
+\item Getting started with the receiver circuit
+\end{itemize}
+
 \section{Work Accomplished }
 % Five to ten sentences providing a non-technical description; use technical words only to describe important specifications. Describe the “big picture” of the project.
+
+\subsection{Block Diagram and Demonstration}
+\includegraphics[scale=0.3]{functional_flow}
+\\We will demonstrate transmission of letter from the pc to pc. For demonstration (debugging) purposes we have used USB to UART converter
+and to show that our transmitter and receiver circuits are working correctly.
 
 \subsection{Reading Literature}
 
 During the first week, each of us went through a number of papers in the field of visible light communication and brainstorming simulataneously. The papers included a wide variety of theoretical aspects regarding the basic concept, however did not extensively cover about the implementation issues. 
 
 \subsection{Software Implementation}
+\begin{itemize}
+\item Familiarized with TivaC capabilities and Code Composer Studio IDE.
+\item Coded serial transmission and reception in PySerial, for testing the transmitter and receiver circuit using UART.
+\item Code for OOK (On-Off Keying) on the transmitter side is implemented, but rigorous testing is still left.
+\end{itemize}
 
 \subsection{Hardware Implementation}
-
-Transmitter circuit: The current circuit comprises an inverter which drives the LED according to the input signal. The waveform input to the LED follows the bit stream upto 1Mhz. The LED is biased using a pull up resistor to make the ensure a certain level of brightness of the LED while transmitting. \\
-
-Receiver Circuit: It consists of a photodetector (BPW34), followed by an amplifier and a high pass filter to remove the 50hc noise due to ambient light. We have currently tested number of designs for the filter by simulating them on LT spice. We are still working on the exact specifications of the filter taking into consideration a number of factors.%like the slew rate of the opamps, its capacitive effects, power required for rail voltages in the final circuit. 
-
+\begin{itemize}
+\item Transmitter circuit: The current circuit comprises an inverter which drives the LED according to the input signal. The waveform input to the LED follows the bit stream upto 1Mhz. The LED is biased using a pull up resistor to make the ensure a certain level of brightness of the LED while transmitting. \\
+\item Receiver Circuit: It consists of a photodetector (BPW34), followed by an amplifier and a high pass filter to remove the 50hc noise due to ambient light. We have currently tested number of designs for the filter by simulating them on LT spice. We are still working on the exact specifications of the filter taking into consideration a number of factors.%like the slew rate of the opamps, its capacitive effects, power required for rail voltages in the final circuit.  
+\end{itemize}
 
 \section{Testing}
 
@@ -54,28 +84,13 @@ We tested each of the components in a sequential manner in order to ensure the i
 \section{Problems Faced}
 
 \begin{itemize}
-% ******************************************** 
-% ARKA FILL SOFTWARE KE PAINS HERE
-%
-%***************************************
-
-
-
-
-\item{We initally had tried to drive the LED using MOSFET IRF$840$ but there seemed to an issue which we couldn't quite figure out the reason for and hence tried the inverter which gave good results.}
-\item{Another issue was with the choice of OPAmp. We had begun with using ua741 which had a very poor slew rate and hence distorted the waveforms. We switched to TL$082$ which has a slew rate sufficient for our application.}
-\item{ Another issue is about the design of the filter. We tried we a simple first order high pass filter which gave poor results even at frequencies as low as $20$kHz due to capacitive effects. We resorted to a higher order filter which gave better results. Currenty, the issue is about to understand the real bottleneck among the Opamp, the filter design and or capacitive effects of the breadboard at these frequencies.}
+\item The Code Composer Studio has many intricacies and getting it to work with TivaC was quite troublesome, since some rule files had to be changed. Also it is quite difficult to debug without a DSO.  
+\item We initally had tried to drive the LED using MOSFET IRF$840$ but there seemed to an issue which we couldn't quite figure out the reason for and hence tried the inverter which gave good results.
+\item Another issue was with the choice of OPAmp. We had begun with using ua741 which had a very poor slew rate and hence distorted the waveforms. We switched to TL$082$ which has a slew rate sufficient for our application.
+\item Another issue is about the design of the filter. We tried we a simple first order high pass filter which gave poor results even at frequencies as low as $20$kHz due to capacitive effects. We resorted to a higher order filter which gave better results. Currenty, the issue is about to understand the real bottleneck among the Opamp, the filter design and or capacitive effects of the breadboard at these frequencies.
 
 \end{itemize}
 
-\section{Work Promised}
-
-\begin{itemize}
-\item Understanding the literature
-\item Procurement of components : The SD card reader is yet to arrive. We have placed an order for the same.
-\item Finishing the transmitter ciruit
-\item Getting started with the receiver circuit
-\end{itemize}
 
 \section{Goals for the next evaluation}
 
