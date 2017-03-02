@@ -2,13 +2,18 @@ import serial
 import sys
 from time import time
 
-ser = serial.Serial('/dev/ttyACM0',115200,timeout=0.01)
-print(ser.name)
-ser.write(b'helloyoas')
-r = ser.read(15)
-print(r)
+ser = serial.Serial('/dev/ttyUSB0',115200,timeout=0.01)
+# print(ser.name)
+# while 1:
+# ser.write(b'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG')
+while 1:
+    ser.write(b'G')
+   
+    #r = ser.read(1)
+    # if (r != b''):
+    #p0rint(r)
 # file_name = './pyserial.py'
-# # for i in sys.argv:
+# for i in sys.argv:
 #     # print (i)
 
 # t = time()
@@ -17,13 +22,13 @@ print(r)
 #     while 1:
 #         c = f.read(1)
 #         if not c:
-#             print ("EOF")
+# #             print ("EOF")
 #             break
-# #         print ("line 19 ok")
+#         # print ("line 19 ok")
 #         ser.write(c.encode('ascii'))
-#         # r = conn.read(1)
-#         # print(r)
-# #         fc += 1
+# #         # r = conn.read(1)
+# #         # print(r)
+# # #         fc += 1
 
 # tt = time() - t;
 
