@@ -8,6 +8,7 @@ ser = serial.Serial('/dev/ttyUSB0',115200,timeout=0.01)
 # ser.write(b'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG')
 while 1:
     ser.write(b'G')
+    ser.write(b'8')
    
     #r = ser.read(1)
     # if (r != b''):

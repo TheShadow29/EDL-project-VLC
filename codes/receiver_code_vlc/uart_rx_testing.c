@@ -19,7 +19,7 @@ int counter;
 bool character[8];
 uint8_t char_to_send;
 
-int main()
+int rx_tester()
 {
     SysCtlClockSet(SYSCTL_SYSDIV_4  | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
