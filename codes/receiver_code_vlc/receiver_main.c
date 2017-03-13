@@ -20,35 +20,62 @@
 extern void config_GPIO();
 extern void gpiob_interrupt_handler();
 
+void single_pin_write(char c, int n, int x)
+{
+//    n= n +1;
+    if (c == 'b')
+    {
+        if (x == 1)
+        {
+            GPIOPinWrite(GPIO_PORTB_BASE,1<<n,1<<n);
+        }
+        else
+        {
+            GPIOPinWrite(GPIO_PORTB_BASE,1<<n,0);
+        }
+    }
+    else if (c == 'f')
+    {
+        if (x==1)
+        {
+            GPIOPinWrite(GPIO_PORTF_BASE, 1<<n,1<< n);
+        }
+        else
+        {
+            GPIOPinWrite(GPIO_PORTF_BASE, 0,1<< n);
+        }
+    }
+}
+
 int main()
 {
     SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
     config_GPIO();
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE,GPIO_PIN_2 | GPIO_PIN_3);
-    int val_to_write = 0;
-    int data_count = 0;
+    int count = 0;
+//    int data_count = 0;
     while(1)
     {
-//        val_to_write ++;
-        if(val_to_write% 2 == 1)
+        if(count% 2 == 1)
         {
-            GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, 0x02);
+            GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, GPIO_PIN_2);
         }
         else
         {
             GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, 0x00);
         }
 
-        if(val_to_write %4 == 2)
-        {
-            GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, 0x08);
-        }
-        else if (val_to_write %4 ==0)
+        if(count %4 == 2)
         {
             GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, 0x00);
-            val_to_write = 0;
         }
-        val_to_write++;
+        else if (count %4 ==0)
+        {
+            GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, GPIO_PIN_3);
+
+            count = 0;
+        }
+        count++;
 
         SysCtlDelay(200);
 //        val_to_write++;

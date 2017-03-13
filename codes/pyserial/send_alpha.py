@@ -6,8 +6,14 @@ ser = serial.Serial('/dev/ttyUSB0',115200,timeout=0.01)
 # print(ser.name)
 # while 1:
 # ser.write(b'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG')
-while 1:
-    ser.write(b'A')
+al = sys.argv[1]
+if al == 'c':
+    ser.write(b'CCCC')
+elif al == 'd':
+    ser.write(b'DDDD')
+elif al == 'e':
+    ser.write(b'EEEE')
+    
     # ser.write(b'8')
    
     #r = ser.read(1)

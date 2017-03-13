@@ -73,7 +73,6 @@
 //! TivaWare-for-C-Series/tools/usb_bulk_example.
 //
 //*****************************************************************************
-
 //*****************************************************************************
 //
 // The system tick rate expressed both as ticks per second and a millisecond
@@ -190,6 +189,102 @@ SysTickIntHandler(void)
 // \return Returns the number of bytes of data processed.
 //
 //*****************************************************************************
+//static uint32_t
+// tx_data_over_gpio_serial(tUSBDBulkDevice *psDevice, uint8_t *pui8Data,
+//                              uint32_t ui32NumBytes)
+//{
+//    uint32_t ui32Loop, ui32Space, ui32Count;
+//    uint32_t ui32ReadIndex;
+//    uint32_t ui32WriteIndex;
+//    tUSBRingBufObject sTxRing;
+//    USBBufferInfoGet(&g_sTxBuffer, &sTxRing);
+//
+//    ui32Space = USBBufferSpaceAvailable(&g_sTxBuffer);
+//
+//    ui32Loop = (ui32Space < ui32NumBytes) ? ui32Space : ui32NumBytes;
+//    ui32Count = ui32Loop;
+//    g_ui32RxCount += ui32NumBytes;
+//    ui32ReadIndex = (uint32_t)(pui8Data - g_pui8USBRxBuffer);
+//    ui32WriteIndex = sTxRing.ui32WriteIndex;
+//
+//    uint8_t data_from_usb = 0;
+//    int i = 0;
+//    for(i = 0; i < ui32NumBytes; i++)
+//    {
+//        data_from_usb = g_pui8USBRxBuffer[ui32ReadIndex];
+//        ui32ReadIndex++;
+//        int j = 0;
+//
+//        for(j = 0; j < 8; j++)
+//        {
+//            GPIOPinWrite(GPIO_PORTB_BASE,GPIO_PIN_2, data_from_usb);
+//            SysCtlDelay(100);
+//        }
+//    }
+//    return (data_from_usb);
+//}
+
+static uint32_t
+NayaData(tUSBDBulkDevice *psDevice, uint8_t *pui8Data,
+         uint32_t ui32NumBytes)
+{
+    uint32_t ui32Loop, ui32Space, ui32Count;
+    uint32_t ui32ReadIndex;
+    uint32_t ui32WriteIndex;
+    tUSBRingBufObject sTxRing;
+
+    USBBufferInfoGet(&g_sTxBuffer, &sTxRing);
+
+    ui32Space = USBBufferSpaceAvailable(&g_sTxBuffer);
+
+    ui32Loop = (ui32Space < ui32NumBytes) ? ui32Space : ui32NumBytes;
+    ui32Count = ui32Loop;
+
+    g_ui32RxCount += ui32NumBytes;
+
+    ui32ReadIndex = (uint32_t)(pui8Data - g_pui8USBRxBuffer);
+    ui32WriteIndex = sTxRing.ui32WriteIndex;
+
+    int dat = 0;
+    while(ui32Loop)
+    {
+
+        // Copy the received character to the transmit buffer.
+        //
+//        g_pui8USBTxBuffer[ui32WriteIndex] =
+//                g_pui8USBRxBuffer[ui32ReadIndex];
+        dat = g_pui8USBRxBuffer[ui32ReadIndex];
+        UARTprintf("L257 dat is %d \n",dat);
+        g_pui8USBTxBuffer[ui32WriteIndex] = dat;
+        GPIOPinWrite(GPIO_PORTB_BASE, 0xff, g_pui8USBRxBuffer[ui32ReadIndex]);
+
+        int j = 0;
+        int  val_write = 0;
+        for(j = 0; j < 8; j++)
+        {
+            val_write = (dat>>j) << 2;
+            UARTprintf("L266 Val_write is %d \n",val_write);
+            GPIOPinWrite(GPIO_PORTB_BASE,GPIO_PIN_2, val_write);
+            SysCtlDelay(100);
+        }
+
+        //
+        // Move to the next character taking care to adjust the pointer for
+        // the buffer wrap if necessary.
+        //
+
+        ui32ReadIndex++;
+        ui32ReadIndex = (ui32ReadIndex == BULK_BUFFER_SIZE) ?
+                0 : ui32ReadIndex;
+
+        ui32Loop--;
+    }
+
+    USBBufferDataWritten(&g_sTxBuffer, ui32Count);
+
+    return(ui32Count);
+}
+
 static uint32_t
 EchoNewDataToHost(tUSBDBulkDevice *psDevice, uint8_t *pui8Data,
                   uint32_t ui32NumBytes)
@@ -417,6 +512,9 @@ RxHandler(void *pvCBData, uint32_t ui32Event,
         //
         //return(EchoNewDataToHost(psDevice, pvMsgData, ui32MsgValue));
         return(NayaData(psDevice, pvMsgData, ui32MsgValue));
+//        uint32_t a = tx_data_over_gpio_serial(psDevice, pvMsgData, ui32MsgValue);
+//        USBBufferFlush(&g_sRxBuffer);
+//        return (1);
     }
 
     //

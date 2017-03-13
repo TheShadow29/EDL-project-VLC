@@ -43,12 +43,14 @@ void gpiob_interrupt_handler()
     if (counter % 2 == 1)
     {
         see_bit[1] = GPIOPinRead(GPIO_PORTB_BASE,GPIO_PIN_1);
+        see_bit[1] = see_bit[1] >>1;
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0x01 );
         demod();
     }
     else
     {
         see_bit[0] = GPIOPinRead(GPIO_PORTB_BASE,GPIO_PIN_1);
+        see_bit[0] = see_bit[0] >>1;
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1,0x00);
     }
     counter = counter + 1;
