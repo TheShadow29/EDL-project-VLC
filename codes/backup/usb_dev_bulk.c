@@ -172,6 +172,41 @@ SysTickIntHandler(void)
     g_ui32SysTickCount++;
 }
 
+bool data_to_tx[2048];
+int tx_counter = 0;
+int tx_c = 0;
+
+void timer0_config()
+{
+    int freq = 50000;
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
+    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);
+    int ui32Period = (SysCtlClockGet() / freq) /4;
+    TimerLoadSet(TIMER0_BASE, TIMER_A, ui32Period - 1);
+    IntEnable(INT_TIMER0A);
+    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+    IntMasterEnable();
+    TimerEnable(TIMER0_BASE, TIMER_A);
+}
+
+void Timer0IntHandler()
+{
+    //    Clear the timer
+    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+    if (tx_c < tx_counter)
+    //    Read the current state and write back the opposite
+    {
+        bool ab = data_to_tx[tx_c++];
+        GPIOPinWrite(GPIO_PORTB_BASE,GPIO_PIN_2, ab << 2);
+    }
+    else
+    {
+        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_2, 0x00);
+    }
+
+}
+
+
 //*****************************************************************************
 //
 // Receive new data and echo it back to the host.
@@ -248,7 +283,6 @@ NayaData(tUSBDBulkDevice *psDevice, uint8_t *pui8Data,
     int dat = 0;
     while(ui32Loop)
     {
-
         // Copy the received character to the transmit buffer.
         //
 //        g_pui8USBTxBuffer[ui32WriteIndex] =
@@ -262,16 +296,21 @@ NayaData(tUSBDBulkDevice *psDevice, uint8_t *pui8Data,
         int  val_write = 0;
         for(j = 0; j < 8; j++)
         {
-            val_write = (dat>>j) << 2;
-            UARTprintf("L266 Val_write is %d \n",val_write);
-            GPIOPinWrite(GPIO_PORTB_BASE,GPIO_PIN_2, val_write);
-            SysCtlDelay(100);
+//            val_write = (dat>>j) << 2;
+//            UARTprintf("L266 Val_write is %d \n",val_write);
+//            GPIOPinWrite(GPIO_PORTB_BASE,GPIO_PIN_2, val_write);
+//            SysCtlDelay(100);
+            if ((dat>>j)&0x01 == 0)
+            {
+                data_to_tx[tx_counter++] = 0;
+                data_to_tx[tx_counter++] = 1;
+            }
+            else
+            {
+                data_to_tx[tx_counter++] = 1;
+                data_to_tx[tx_counter++] = 0;
+            }
         }
-
-        //
-        // Move to the next character taking care to adjust the pointer for
-        // the buffer wrap if necessary.
-        //
 
         ui32ReadIndex++;
         ui32ReadIndex = (ui32ReadIndex == BULK_BUFFER_SIZE) ?
@@ -580,13 +619,19 @@ ConfigureUART(void)
 //
 //*****************************************************************************
 int
-main(void)
+un_main(void)
 {
     volatile uint32_t ui32Loop;
     uint32_t ui32TxCount;
     uint32_t ui32RxCount;
 
-    //
+    data_to_tx[0] = 1;
+    data_to_tx[1] = 0;
+    data_to_tx[2] = 1;
+    data_to_tx[3] = 1;
+    tx_counter = 4;
+
+     //
     // Enable lazy stacking for interrupt handlers.  This allows floating-point
     // instructions to be used within interrupt handlers, but at the expense of
     // extra stack usage.
@@ -674,6 +719,8 @@ main(void)
     //
     // Main application loop.
     //
+    timer0_config();
+
     while(1)
     {
         //

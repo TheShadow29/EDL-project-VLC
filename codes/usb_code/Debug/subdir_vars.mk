@@ -9,37 +9,37 @@ CMD_SRCS += \
 C_SRCS += \
 ../some_functions.c \
 ../startup_ccs.c \
-../usb_bulk_structs.c \
-../usb_dev_bulk.c 
+../tx_data_over_usb.c \
+../usb_bulk_structs.c 
 
 C_DEPS += \
 ./some_functions.d \
 ./startup_ccs.d \
-./usb_bulk_structs.d \
-./usb_dev_bulk.d 
+./tx_data_over_usb.d \
+./usb_bulk_structs.d 
 
 OBJS += \
 ./some_functions.obj \
 ./startup_ccs.obj \
-./usb_bulk_structs.obj \
-./usb_dev_bulk.obj 
+./tx_data_over_usb.obj \
+./usb_bulk_structs.obj 
 
 OBJS__QUOTED += \
 "some_functions.obj" \
 "startup_ccs.obj" \
-"usb_bulk_structs.obj" \
-"usb_dev_bulk.obj" 
+"tx_data_over_usb.obj" \
+"usb_bulk_structs.obj" 
 
 C_DEPS__QUOTED += \
 "some_functions.d" \
 "startup_ccs.d" \
-"usb_bulk_structs.d" \
-"usb_dev_bulk.d" 
+"tx_data_over_usb.d" \
+"usb_bulk_structs.d" 
 
 C_SRCS__QUOTED += \
 "../some_functions.c" \
 "../startup_ccs.c" \
-"../usb_bulk_structs.c" \
-"../usb_dev_bulk.c" 
+"../tx_data_over_usb.c" \
+"../usb_bulk_structs.c" 
 
 

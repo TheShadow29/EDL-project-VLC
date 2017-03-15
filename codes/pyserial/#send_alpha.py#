@@ -6,25 +6,25 @@ ser = serial.Serial('/dev/ttyUSB0',115200,timeout=0.01)
 # print(ser.name)
 # while 1:
 # ser.write(b'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG')
-al = input()
+print (sys.argv[1])
+al = sys.argv[1]
 while 1:
-    # al = input()
-    # print (Your Input al)
     if al == 'c':
-        ser.write(b'C')
-    elif al == 'd':
-        ser.write(b'D')
-    elif al == 'e':
-        ser.write(b'E')
-    
+    ser.write(b'CCCC')
+elif al == 'd':
+    ser.write(b'DDDD')
+elif al == 'e':
+    ser.write(b'EEEE')
+else:
+    continue
     # ser.write(b'8')
    
     #r = ser.read(1)
     # if (r != b''):
     #p0rint(r)
-    # file_name = './pyserial.py'
-    # for i in sys.argv:
-    #     # print (i)
+# file_name = './pyserial.py'
+# for i in sys.argv:
+#     # print (i)
 
 # t = time()
 # fc = 0

@@ -7,7 +7,7 @@ ser = serial.Serial('/dev/ttyUSB0',115200,timeout=0.01)
 # while 1:
 # ser.write(b'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG')
 while 1:
-    ser.write(b'A')
+    ser.write(b'C')
     # ser.write(b'8')
    
     #r = ser.read(1)

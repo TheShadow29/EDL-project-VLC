@@ -11,6 +11,7 @@ receiver_main.obj: /home/arktheshadow/ti/SW-EK-TM4C123GXL-2.1.3.156/driverlib/pi
 receiver_main.obj: /home/arktheshadow/ti/SW-EK-TM4C123GXL-2.1.3.156/driverlib/sysctl.h
 receiver_main.obj: /home/arktheshadow/ti/SW-EK-TM4C123GXL-2.1.3.156/inc/hw_ints.h
 receiver_main.obj: /home/arktheshadow/ti/SW-EK-TM4C123GXL-2.1.3.156/driverlib/interrupt.h
+receiver_main.obj: /home/arktheshadow/ti/SW-EK-TM4C123GXL-2.1.3.156/driverlib/timer.h
 
 ../receiver_main.c: 
 /home/arktheshadow/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.0.LTS/include/stdint.h: 
@@ -23,3 +24,4 @@ receiver_main.obj: /home/arktheshadow/ti/SW-EK-TM4C123GXL-2.1.3.156/driverlib/in
 /home/arktheshadow/ti/SW-EK-TM4C123GXL-2.1.3.156/driverlib/sysctl.h: 
 /home/arktheshadow/ti/SW-EK-TM4C123GXL-2.1.3.156/inc/hw_ints.h: 
 /home/arktheshadow/ti/SW-EK-TM4C123GXL-2.1.3.156/driverlib/interrupt.h: 
+/home/arktheshadow/ti/SW-EK-TM4C123GXL-2.1.3.156/driverlib/timer.h: 

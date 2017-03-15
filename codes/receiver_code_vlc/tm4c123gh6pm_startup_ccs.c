@@ -44,6 +44,8 @@ extern void _c_int00(void);
 extern void UARTIntHandler();
 //extern void PortFIntHandler();
 extern void gpiob_interrupt_handler();
+extern void gpioc_interrupt_handler();
+extern void timer0_interrrupt_handler();
 
 //*****************************************************************************
 //
@@ -105,7 +107,7 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // ADC Sequence 2
     IntDefaultHandler,                      // ADC Sequence 3
     IntDefaultHandler,                      // Watchdog timer
-    IntDefaultHandler,                      // Timer 0 subtimer A
+    timer0_interrrupt_handler,                      // Timer 0 subtimer A
     IntDefaultHandler,                      // Timer 0 subtimer B
     IntDefaultHandler,                      // Timer 1 subtimer A
     IntDefaultHandler,                      // Timer 1 subtimer B
