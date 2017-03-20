@@ -328,7 +328,7 @@ void send_data()
     {
         bool ab = data_to_tx[tx_back++];
         GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0, ab);
-        SysCtlDelay(1);
+        ROM_SysCtlDelay(100);
     }
     if(tx_back == tx_front)
     {
@@ -336,6 +336,22 @@ void send_data()
         tx_front = 0;
         g_bRxAvailable = 0;
     }
+}
+
+void send_data2()
+{
+    while (tx_back < rx_array_pos)
+    {
+        bool ab = data_to_tx[tx_back++];
+        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0, ab);
+        ROM_SysCtlDelay(100);
+    }
+//    if(tx_back == tx_front)
+//    {
+        tx_back = 0;
+//        tx_front = 0;
+        g_bRxAvailable = 0;
+
 }
 
 
@@ -390,32 +406,32 @@ int main()
 
     while(1)
     {
-//        tx_byte(0b11001010);
+//        tx_byte(0b10101010);
 
-//        send_data();
+        send_data2();
 
 
-        if(g_bRxAvailable)
-        {
-//            if(start_count < 30)
-//            {
-//                start_count++;
-//                g_ui32NumBytes -- ;
-////                g_bRxAvailable = 0;
-////                continue;
-//            }
-//            else
-//            {
-                while(g_ui32NumBytes)
-                {
-                    tx_byte(g_pui8USBRxBuffer[rx_array_pos]);
-                    send_data();
-                    g_ui32NumBytes -- ;
-                    rx_array_pos = (rx_array_pos+1)%BULK_BUFFER_SIZE;
-                }
-//            }
-
-        }
+//        if(g_bRxAvailable)
+//        {
+////            if(start_count < 30)
+////            {
+////                start_count++;
+////                g_ui32NumBytes -- ;
+//////                g_bRxAvailable = 0;
+//////                continue;
+////            }
+////            else
+////            {
+//                while(g_ui32NumBytes)
+//                {
+//                    tx_byte(g_pui8USBRxBuffer[rx_array_pos]);
+//                    send_data();
+//                    g_ui32NumBytes -- ;
+//                    rx_array_pos = (rx_array_pos+1)%BULK_BUFFER_SIZE;
+//                }
+////            }
+//
+//        }
     }
 
 }
