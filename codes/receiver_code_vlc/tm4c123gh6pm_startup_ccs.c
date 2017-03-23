@@ -41,7 +41,7 @@ static void IntDefaultHandler(void);
 //
 //*****************************************************************************
 extern void _c_int00(void);
-extern void UARTIntHandler();
+//extern void UARTIntHandler();
 //extern void PortFIntHandler();
 extern void gpiob_interrupt_handler();
 //extern void gpioc_interrupt_handler();

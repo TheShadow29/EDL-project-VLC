@@ -16,7 +16,7 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/timer.h"
 
-int32_t data_in[100];
+int32_t data_in[500];
 int32_t see_bit[2];
 int32_t counter;
 
@@ -45,6 +45,7 @@ void gpiob_interrupt_handler()
     GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_0);
 //    data_in[counter] =
     data_in[counter] = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_1);
+//    data_in[counter] = data_in[counter] >> 1;
 
     if (counter % 2 == 1)
     {
@@ -108,7 +109,7 @@ void config_GPIO()
     GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_3|GPIO_PIN_4);
     GPIOIntDisable(GPIO_PORTB_BASE, GPIO_PIN_0);
     GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_0);
-//    GPIOIntRegister(GPIO_PORTB_BASE,gpiob_interrupt_handler);
+    GPIOIntRegister(GPIO_PORTB_BASE,gpiob_interrupt_handler);
     GPIOIntTypeSet(GPIO_PORTB_BASE,GPIO_PIN_0,GPIO_FALLING_EDGE);
     GPIOIntEnable(GPIO_PORTB_BASE,GPIO_PIN_0);
 
@@ -121,5 +122,4 @@ void config_GPIO()
     counter = 0;
 
 }
-
 

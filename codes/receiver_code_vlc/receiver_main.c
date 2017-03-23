@@ -30,7 +30,7 @@ extern void gpiob_interrupt_handler();
 bool data_to_tx[2048];
 int tx_front = 0;
 int tx_back = 0;
-int cl_delay = 3233.6/(200 - 6.1629);
+int cl_delay = 3233.6/(100 - 6.1629);
 //int test_cl = 100;
 bool clk = 0;
 void send_data(int);
@@ -179,7 +179,7 @@ int main()
 //        tx_bits(1);
 
 //        tx_byte(0b10101010);
-        send_data(3);
+//        send_data(3);
 //        tx_bits(0b11001010);
 
 //        bool dat_bit;
