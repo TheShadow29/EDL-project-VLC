@@ -16,13 +16,20 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/timer.h"
 
-int32_t data_in[500];
+int32_t data_in[2048];
 int32_t see_bit[2];
 int32_t counter;
 
 int falling_edges_count = 0;
 
-
+void init_zero()
+{
+    int k = 0;
+    for(k = 0; k < 2048; k++)
+    {
+        data_in[k] = 0;
+    }
+}
 
 void demod()
 {

@@ -1,4 +1,10 @@
 /*
+ * tx_direct_buffer.c
+ *
+ *  Created on: 23-Mar-2017
+ *      Author: arktheshadow
+ */
+/*
  * receiver_main.c
  *
  *  Created on: 06-Mar-2017
@@ -18,9 +24,9 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/timer.h"
 
-extern void config_GPIO();
-extern void config_timer();
-extern void gpiob_interrupt_handler();
+//extern void config_GPIO();
+//extern void config_timer();
+//extern void gpiob_interrupt_handler();
 
 //100 -> 38.25k
 //75 -> 49.65k
@@ -31,14 +37,38 @@ bool data_to_tx[2048];
 int tx_front = 0;
 int tx_back = 0;
 int cl_delay = 3233.6/(100 - 6.1629);
-int n_bits_tx = 99;
+int n_bits_tx = 6;
 //int test_cl = 100;
 bool clk = 0;
 void send_data(int);
 void tx_byte(uint8_t);
 uint8_t byte_test = 0b11001010;
+void config_GPIO()
+{
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
+//    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1);
+    //PIN 0 : External Clock
+    //Pin 1 : Data from the PLL
+    GPIOPinTypeGPIOInput(GPIO_PORTB_BASE, GPIO_PIN_0|GPIO_PIN_1);
+//    GPIOPinTypeGPIOInput(GPIO_PORTC_BASE, GPIO_PIN_4);
+    GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_3|GPIO_PIN_4);
+    GPIOIntDisable(GPIO_PORTB_BASE, GPIO_PIN_0);
+    GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_0);
+//    GPIOIntRegister(GPIO_PORTB_BASE,gpiob_interrupt_handler);
+    GPIOIntTypeSet(GPIO_PORTB_BASE,GPIO_PIN_0,GPIO_FALLING_EDGE);
+    GPIOIntEnable(GPIO_PORTB_BASE,GPIO_PIN_0);
 
-extern void init_zero();
+//    GPIOIntDisable(GPIO_PORTC_BASE, GPIO_PIN_4);
+//    GPIOIntClear(GPIO_PORTC_BASE, GPIO_PIN_4);
+//    GPIOIntRegister(GPIO_PORTC_BASE,gpioc_interrupt_handler);
+//    GPIOIntTypeSet(GPIO_PORTC_BASE,GPIO_PIN_4,GPIO_FALLING_EDGE);
+//    GPIOIntEnable(GPIO_PORTC_BASE,GPIO_PIN_4);
+//    IntMasterEnable();
+//    counter = 0;
+
+}
 
 void timer0_interrrupt_handler()
 {
@@ -123,6 +153,11 @@ void tx_bits(bool bit)
          GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_3, bit << 3);
         SysCtlDelay(190);
 }
+//
+//void put_into_buffer(uint8_t)
+//{
+//
+//}
 
 int main()
  {
@@ -140,20 +175,36 @@ int main()
     uint8_t bro_ka_byte = 0b10101010;
     bool dat_bit = 0;
     t_j = 0;
-    init_zero();
-//    while(t_j < 300)
-//    {
-//        data_to_tx[tx_front++] = (t_j++)%2;
-//    }
-//    t_j = 0;
-//
-//    while(t_j < n_bits_tx)
-//    {
-//        data_to_tx[tx_front++] = (t_j)%3;
-//        data_to_tx[tx_front++] = (t_j)%3;
-//        data_to_tx[tx_front++] = (t_j+1)%3;
-//        t_j += 3;
-//    }
+    while(t_j < 500)
+    {
+        data_to_tx[tx_front++] = (t_j++)%2;
+    }
+    t_j = 0;
+
+    while(t_j < n_bits_tx)
+    {
+        data_to_tx[tx_front++] = 1;
+        data_to_tx[tx_front++] = 0;
+        data_to_tx[tx_front++] = 1;
+        data_to_tx[tx_front++] = 0;
+        data_to_tx[tx_front++] = 0;
+        data_to_tx[tx_front++] = 1;
+        data_to_tx[tx_front++] = 1;
+        data_to_tx[tx_front++] = 0;
+        data_to_tx[tx_front++] = 0;
+        data_to_tx[tx_front++] = 1;
+        data_to_tx[tx_front++] = 1;
+        data_to_tx[tx_front++] = 0;
+        data_to_tx[tx_front++] = 1;
+        data_to_tx[tx_front++] = 0;
+        data_to_tx[tx_front++] = 0;
+        data_to_tx[tx_front++] = 1;
+        data_to_tx[tx_front++] = 0;
+        data_to_tx[tx_front++] = 1;
+        data_to_tx[tx_front++] = 1;
+        data_to_tx[tx_front++] = 0;
+        t_j++;
+    }
 
 //    while(t_j)
 //    {
@@ -175,7 +226,7 @@ int main()
 
 
 
-    IntMasterEnable();
+//    IntMasterEnable();
 
     while(1)
     {
@@ -191,7 +242,7 @@ int main()
 //        tx_bits(1);
 
 //        tx_byte(0b10101010);
-//        send_data(3);
+        send_data(3);
 //        tx_bits(0b11001010);
 
 //        bool dat_bit;

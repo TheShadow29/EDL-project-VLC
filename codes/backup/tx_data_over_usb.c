@@ -29,8 +29,8 @@
 #include "usb_bulk_structs.h"
 
 bool data_to_tx[256];
-//int tx_front = 0;
-//int tx_back = 0;
+int tx_front = 0;
+int tx_back = 0;
 
 volatile uint8_t g_ui8ParallelOut = 0b01101001;
 volatile bool g_bIntDone = 0;
@@ -284,15 +284,15 @@ ConfigureUART(void)
 }
 
 
-//void tx_byte(uint8_t byte)
-//{
-//    int j = 0;
-//    for(j = 0; j < 8; j++)
-//    {
-//        uint8_t a = byte;
-//        data_to_tx[tx_front++] = (byte >> j)&(0x01);
-//    }
-//}
+void tx_byte(uint8_t byte)
+{
+    int j = 0;
+    for(j = 0; j < 8; j++)
+    {
+        uint8_t a = byte;
+        data_to_tx[tx_front++] = (byte >> j)&(0x01);
+    }
+}
 
 void timer0_config()
 {
@@ -306,56 +306,56 @@ void timer0_config()
     IntMasterEnable();
     TimerEnable(TIMER0_BASE, TIMER_A);
 }
-//void Timer0IntHandler()
-//{
-//    //    Clear the timer
-//    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-//    if (tx_back < tx_front)
-//        //    Read the current state and write back the opposite
-//    {
-//        bool ab = data_to_tx[tx_back++];
-//        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0, ab);
-//    }
-//    else
-//    {
-//        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0, 0x00);
-//    }
-//}
+void Timer0IntHandler()
+{
+    //    Clear the timer
+    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+    if (tx_back < tx_front)
+        //    Read the current state and write back the opposite
+    {
+        bool ab = data_to_tx[tx_back++];
+        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0, ab);
+    }
+    else
+    {
+        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0, 0x00);
+    }
+}
 
-//void send_data()
-//{
-//    while (tx_back < tx_front)
-//    {
-//        bool ab = data_to_tx[tx_back++];
-//        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0, ab);
-//        ROM_SysCtlDelay(100);
-//    }
+void send_data()
+{
+    while (tx_back < tx_front)
+    {
+        bool ab = data_to_tx[tx_back++];
+        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0, ab);
+        ROM_SysCtlDelay(100);
+    }
+    if(tx_back == tx_front)
+    {
+        tx_back = 0;
+        tx_front = 0;
+        g_bRxAvailable = 0;
+    }
+}
+
+void send_data2()
+{
+    while (tx_back < rx_array_pos)
+    {
+        bool ab = data_to_tx[tx_back++];
+        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0, ab);
+        ROM_SysCtlDelay(100);
+    }
 //    if(tx_back == tx_front)
 //    {
-//        tx_back = 0;
+        tx_back = 0;
 //        tx_front = 0;
-//        g_bRxAvailable = 0;
-//    }
-//}
+        g_bRxAvailable = 0;
 
-//void send_data2()
-//{
-//    while (tx_back < rx_array_pos)
-//    {
-//        bool ab = data_to_tx[tx_back++];
-//        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0, ab);
-//        ROM_SysCtlDelay(100);
-//    }
-////    if(tx_back == tx_front)
-////    {
-//        tx_back = 0;
-////        tx_front = 0;
-//        g_bRxAvailable = 0;
-//
-//}
+}
 
 
-int usb_main()
+int main()
 {
 
     // Set the clocking to run from the PLL at 50MHz
