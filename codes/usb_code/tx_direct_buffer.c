@@ -33,10 +33,11 @@
 //50 -> 70.71k
 //float freq = 50;
 
+int data_buff_size = 2048;
 bool data_to_tx[2048];
 int tx_front = 0;
 int tx_back = 0;
-int cl_delay = 3233.6/(100 - 6.1629);
+int cl_delay = 3233.6/(22 - 6.1629);
 int n_bits_tx = 6;
 //int test_cl = 100;
 bool clk = 0;
@@ -122,7 +123,12 @@ void send_data(int n)
     {
         bool ab = data_to_tx[tx_back++];
         GPIOPinWrite(GPIO_PORTB_BASE, pin_n, ab << n);
+//        tx_back = (tx_back)%data_buff_size;
         SysCtlDelay(cl_delay);
+        if(tx_back == tx_front)
+        {
+            tx_back = 0;
+        }
     }
 
 //    if(tx_back == tx_front)
