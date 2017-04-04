@@ -1,7 +1,7 @@
 ******************************************************************************
                   TI ARM Linker Unix v16.9.0                   
 ******************************************************************************
->> Linked Thu Mar 23 16:30:17 2017
+>> Linked Tue Apr  4 18:32:41 2017
 
 OUTPUT FILE NAME:   <Receiver_vlc.out>
 ENTRY POINT SYMBOL: "_c_int00"  address: 00000c81
@@ -12,7 +12,7 @@ MEMORY CONFIGURATION
          name            origin    length      used     unused   attr    fill
 ----------------------  --------  ---------  --------  --------  ----  --------
   FLASH                 00000000   00040000  00001200  0003ee00  R  X
-  SRAM                  20000000   00008000  00002ca4  0000535c  RW X
+  SRAM                  20000000   00008000  00006ca4  0000135c  RW X
 
 
 SEGMENT ALLOCATION MAP
@@ -24,11 +24,11 @@ run origin  load origin   length   init length attrs members
   0000026c    0000026c    00000ce0   00000ce0    r-x .text
   00000f4c    00000f4c    0000025c   0000025c    r-- .const
   000011a8    000011a8    00000058   00000058    r-- .cinit
-20000000    20000000    00002ca4   00000000    rw-
+20000000    20000000    00006ca4   00000000    rw-
   20000000    20000000    0000026c   00000000    rw- .vtable
-  2000026c    2000026c    0000280c   00000000    rw- .bss
-  20002a78    20002a78    00000200   00000000    rw- .stack
-  20002c78    20002c78    0000002c   00000000    rw- .data
+  2000026c    2000026c    0000680c   00000000    rw- .bss
+  20006a78    20006a78    00000200   00000000    rw- .stack
+  20006c78    20006c78    0000002c   00000000    rw- .data
 
 
 SECTION ALLOCATION MAP
@@ -105,32 +105,32 @@ section   page    origin      length       input sections
 .vtable    0    20000000    0000026c     UNINITIALIZED
                   20000000    0000026c     driverlib.lib : interrupt.obj (.vtable)
 
-.bss       0    2000026c    0000280c     UNINITIALIZED
-                  2000026c    00002000     (.common:data_in)
-                  2000226c    00000800     (.common:data_to_tx)
-                  20002a6c    00000008     (.common:see_bit)
-                  20002a74    00000004     (.common:counter)
+.bss       0    2000026c    0000680c     UNINITIALIZED
+                  2000026c    00006000     (.common:data_in)
+                  2000626c    00000800     (.common:data_to_tx)
+                  20006a6c    00000008     (.common:see_bit)
+                  20006a74    00000004     (.common:counter)
 
-.data      0    20002c78    0000002c     UNINITIALIZED
-                  20002c78    00000012     receiver_main.obj (.data)
-                  20002c8a    00000002     --HOLE--
-                  20002c8c    0000000c     rtsv7M4_T_le_v4SPD16_eabi.lib : exit.obj (.data:$O1$$)
-                  20002c98    00000008                                   : _lock.obj (.data:$O1$$)
-                  20002ca0    00000004                                   : stkdepth_vars.obj (.data)
+.data      0    20006c78    0000002c     UNINITIALIZED
+                  20006c78    00000012     receiver_main.obj (.data)
+                  20006c8a    00000002     --HOLE--
+                  20006c8c    0000000c     rtsv7M4_T_le_v4SPD16_eabi.lib : exit.obj (.data:$O1$$)
+                  20006c98    00000008                                   : _lock.obj (.data:$O1$$)
+                  20006ca0    00000004                                   : stkdepth_vars.obj (.data)
 
-.stack     0    20002a78    00000200     UNINITIALIZED
-                  20002a78    00000200     --HOLE--
+.stack     0    20006a78    00000200     UNINITIALIZED
+                  20006a78    00000200     --HOLE--
 
 MODULE SUMMARY
 
        Module                         code   ro data   rw data
        ------                         ----   -------   -------
     ./
-       read_data_xtal.obj             460    0         8204   
+       read_data_xtal.obj             460    0         24588  
        receiver_main.obj              512    0         2066   
        tm4c123gh6pm_startup_ccs.obj   12     620       0      
     +--+------------------------------+------+---------+---------+
-       Total:                         984    620       10270  
+       Total:                         984    620       26654  
                                                               
     /home/arktheshadow/ti/SW-EK-TM4C123GXL-2.1.3.156/driverlib/ccs/Debug/driverlib.lib
        gpio.obj                       608    384       0      
@@ -163,14 +163,14 @@ MODULE SUMMARY
        Stack:                         0      0         512    
        Linker Generated:              0      81        0      
     +--+------------------------------+------+---------+---------+
-       Grand Total:                   3292   1305      11426  
+       Grand Total:                   3292   1305      27810  
 
 
 LINKER GENERATED COPY TABLES
 
 __TI_cinit_table @ 000011e8 records: 3, size/record: 8, table size: 24
-	.data: load addr=000011a8, load size=0000001d bytes, run addr=20002c78, run size=0000002c bytes, compression=lzss
-	.bss: load addr=000011d8, load size=00000008 bytes, run addr=2000026c, run size=0000280c bytes, compression=zero_init
+	.data: load addr=000011a8, load size=0000001d bytes, run addr=20006c78, run size=0000002c bytes, compression=lzss
+	.bss: load addr=000011d8, load size=00000008 bytes, run addr=2000026c, run size=0000680c bytes, compression=zero_init
 	.vtable: load addr=000011e0, load size=00000008 bytes, run addr=20000000, run size=0000026c bytes, compression=zero_init
 
 
@@ -213,19 +213,19 @@ UNDEFED   SHT$$INIT_ARRAY$$Limit
 00000f45  TimerIntClear                  
 00000f25  TimerIntEnable                 
 00000eb7  TimerLoadSet                   
-20002c78  __STACK_END                    
+20006c78  __STACK_END                    
 00000200  __STACK_SIZE                   
-20002c78  __STACK_TOP                    
+20006c78  __STACK_TOP                    
 000011e8  __TI_CINIT_Base                
 00001200  __TI_CINIT_Limit               
 000011c8  __TI_Handler_Table_Base        
 000011d4  __TI_Handler_Table_Limit       
 00000a89  __TI_auto_init                 
-20002c8c  __TI_cleanup_ptr               
+20006c8c  __TI_cleanup_ptr               
 00000b61  __TI_decompress_lzss           
 00000ee7  __TI_decompress_none           
-20002c90  __TI_dtors_ptr                 
-20002c94  __TI_enable_exit_profile_output
+20006c90  __TI_dtors_ptr                 
+20006c94  __TI_enable_exit_profile_output
 ffffffff  __TI_pprof_out_hndl            
 ffffffff  __TI_prof_data_size            
 ffffffff  __TI_prof_data_start           
@@ -243,27 +243,27 @@ ffffffff  __TI_prof_data_start
 ffffffff  __binit__                      
 ffffffff  __c_args__                     
 0000076b  __mpu_init                     
-20002a78  __stack                        
+20006a78  __stack                        
 00000e79  _args_main                     
 00000c81  _c_int00                       
-20002c98  _lock                          
+20006c98  _lock                          
 00000e9f  _nop                           
 00000e97  _register_lock                 
 00000e91  _register_unlock               
 00000a87  _system_post_cinit             
 00000f49  _system_pre_init               
-20002c9c  _unlock                        
+20006c9c  _unlock                        
 00000cd9  abort                          
 ffffffff  binit                          
-20002c89  byte_test                      
-20002c80  cl_delay                       
-20002c88  clk                            
+20006c89  byte_test                      
+20006c80  cl_delay                       
+20006c88  clk                            
 000005af  config_GPIO                    
 00000571  config_timer                   
 00000d29  copy_in                        
-20002a74  counter                        
+20006a74  counter                        
 2000026c  data_in                        
-2000226c  data_to_tx                     
+2000626c  data_to_tx                     
 0000049d  demod                          
 00000ce1  exit                           
 20000000  g_pfnRAMVectors                
@@ -271,19 +271,19 @@ ffffffff  binit
 000004f5  gpiob_interrupt_handler        
 0000046d  init_zero                      
 0000040b  main                           
-20002ca0  main_func_sp                   
+20006ca0  main_func_sp                   
 00000971  memcpy                         
 00000a15  memset                         
-20002c84  n_bits_tx                      
-20002a6c  see_bit                        
+20006c84  n_bits_tx                      
+20006a6c  see_bit                        
 00000329  send_data                      
 000002af  single_pin_write               
 0000026d  timer0_interrrupt_handler      
 00000279  timer1_interrupt_handler       
-20002c7c  tx_back                        
+20006c7c  tx_back                        
 000003ed  tx_bits                        
 00000383  tx_byte                        
-20002c78  tx_front                       
+20006c78  tx_front                       
 
 
 GLOBAL SYMBOLS: SORTED BY Symbol Address 
@@ -362,24 +362,24 @@ address   name
 00001200  __TI_CINIT_Limit               
 20000000  g_pfnRAMVectors                
 2000026c  data_in                        
-2000226c  data_to_tx                     
-20002a6c  see_bit                        
-20002a74  counter                        
-20002a78  __stack                        
-20002c78  __STACK_END                    
-20002c78  __STACK_TOP                    
-20002c78  tx_front                       
-20002c7c  tx_back                        
-20002c80  cl_delay                       
-20002c84  n_bits_tx                      
-20002c88  clk                            
-20002c89  byte_test                      
-20002c8c  __TI_cleanup_ptr               
-20002c90  __TI_dtors_ptr                 
-20002c94  __TI_enable_exit_profile_output
-20002c98  _lock                          
-20002c9c  _unlock                        
-20002ca0  main_func_sp                   
+2000626c  data_to_tx                     
+20006a6c  see_bit                        
+20006a74  counter                        
+20006a78  __stack                        
+20006c78  __STACK_END                    
+20006c78  __STACK_TOP                    
+20006c78  tx_front                       
+20006c7c  tx_back                        
+20006c80  cl_delay                       
+20006c84  n_bits_tx                      
+20006c88  clk                            
+20006c89  byte_test                      
+20006c8c  __TI_cleanup_ptr               
+20006c90  __TI_dtors_ptr                 
+20006c94  __TI_enable_exit_profile_output
+20006c98  _lock                          
+20006c9c  _unlock                        
+20006ca0  main_func_sp                   
 ffffffff  __TI_pprof_out_hndl            
 ffffffff  __TI_prof_data_size            
 ffffffff  __TI_prof_data_start           

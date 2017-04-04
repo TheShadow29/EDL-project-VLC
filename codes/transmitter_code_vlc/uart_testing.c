@@ -13,7 +13,7 @@ uint8_t character_get[100];
 void send_bin(uint8_t bin);
 void convert_uint_to_bin(int num);
 
-int main()
+int un_main()
 {
     SysCtlClockSet(SYSCTL_SYSDIV_4  | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);

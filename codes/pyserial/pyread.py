@@ -1,0 +1,2 @@
+f = file('blank.dat')
+

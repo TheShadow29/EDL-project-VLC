@@ -47,7 +47,9 @@ extern void gpiob_interrupt_handler();
 //extern void gpioc_interrupt_handler();
 //extern void timer0_interrrupt_handler();
 //extern void timer1_interrupt_handler();
-
+//extern void SysTickIntHandler(void);
+//extern void UARTStdioIntHandler(void);
+//extern void USB0DeviceIntHandler(void);
 //*****************************************************************************
 //
 // Linker variable that marks the top of the stack.

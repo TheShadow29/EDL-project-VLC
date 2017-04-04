@@ -30,6 +30,16 @@
 			<type>1</type>
 			<locationURI>PARENT-7-PROJECT_LOC/ti/SW-EK-TM4C123GXL-2.1.3.156/driverlib/ccs/Debug/driverlib.lib</locationURI>
 		</link>
+		<link>
+			<name>utils/uartstdio.c</name>
+			<type>1</type>
+			<locationURI>tiva_ware/utils/uartstdio.c</locationURI>
+		</link>
+		<link>
+			<name>utils/ustdlib.c</name>
+			<type>1</type>
+			<locationURI>tiva_ware/utils/ustdlib.c</locationURI>
+		</link>
 	</linkedResources>
 	<variableList>
 		<variable>
