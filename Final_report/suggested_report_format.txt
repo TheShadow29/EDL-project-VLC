@@ -1,0 +1,36 @@
+a)        Title Page (Project title, Project code (B01..B21, or D01..D24), your
+names & roll nos, Faculty mentor, TAs/RAs associated with your project)
+b)        Abstract (100 words)
+c)        Table of Contents
+d)        Chapter 1: Introduction
+Give Project objective, Block diagram, Motivation for the work
+e)        Chapter 2: Project Design
+Give details of the system design, choice of sub systems and other design
+steps/strategy
+f)        Chapter 3 Project Implementation
+Give details of the various subsystems (include neat circuit diagrams (no
+hand drawn diagrams please) with component values, photographs).
+Please do not give listing of your code in the report. Instead add
+comments to your code and upload it on YAWP (after the Final demo). We
+shall involve the TA/RA associated with your project for this step.
+g)        Chapter 4: Performance Evaluation - prototype details, test results,
+problems faced (and lessons learned), etc.
+h)        Chapter 5: Conclusion and suggestions for future work
+Note:
+1.        EDL Final report will have 20% weightage. Your final report form a very
+important part of your project. Give clear documentation of your work
+(many of you complained about the poor documentation of some of the
+earlier EDL reports!). We plan to give Bonus marks to well written
+reports. Please note that poorly written reports would seriously affect
+your final grades.
+2.        Adhere strictly to the following report deadlines:
+DD batch : 10 am, April 7, Fri
+B.Tech batch : 10 am, April 10, Mon
+Late submissions will attract negative marks.
+3.We shall give our feedback on your
+reports during the presentation and demo. Incorporate the suggested changes and submit the final version of the reports latest by April 17th.
+4.Once the demo is over you need to handover your project and other
+components/items borrowed/bought to the WEL lab.
+5.Unless specially authorized by one of us, be sure to handover your
+project and return items and components to the WEL lab (latest by April
+17th) to avoid withholding of your grades.
