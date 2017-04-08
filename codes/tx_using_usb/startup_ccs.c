@@ -59,6 +59,7 @@ extern uint32_t __STACK_TOP;
 extern void SysTickIntHandler(void);
 extern void UARTStdioIntHandler(void);
 extern void USB0DeviceIntHandler(void);
+extern void timer0_interrrupt_handler(void);
 
 //*****************************************************************************
 //
@@ -106,7 +107,7 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // ADC Sequence 2
     IntDefaultHandler,                      // ADC Sequence 3
     IntDefaultHandler,                      // Watchdog timer
-    IntDefaultHandler,                      // Timer 0 subtimer A
+    timer0_interrrupt_handler,                      // Timer 0 subtimer A
     IntDefaultHandler,                      // Timer 0 subtimer B
     IntDefaultHandler,                      // Timer 1 subtimer A
     IntDefaultHandler,                      // Timer 1 subtimer B

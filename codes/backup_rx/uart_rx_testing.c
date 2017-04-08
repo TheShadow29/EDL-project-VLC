@@ -15,7 +15,7 @@ void convert_char_to_bin(uint8_t ch);
 void send_char();
 void PortFIntHandler();
 uint8_t bool_to_uint8();
-int counter;
+int data_in_ptr;
 bool character[8];
 uint8_t char_to_send;
 
@@ -61,7 +61,7 @@ int rx_tester()
     UARTCharPut(UART0_BASE, 't');
     UARTCharPut(UART0_BASE, ':');
     UARTCharPut(UART0_BASE, ' ');
-    counter = 0;
+    data_in_ptr = 0;
     while(1)
     {
         //        if (UARTCharsAvail(UART0_BASE))
@@ -85,11 +85,11 @@ void PortFIntHandler()
     GPIOIntClear(GPIO_PORTF_BASE,status);
     int32_t value = GPIOPinRead(GPIO_PORTF_BASE,GPIO_PIN_4);
 
-    character[counter] = value;
-    counter = counter + 1;
-    if (counter == 8)
+    character[data_in_ptr] = value;
+    data_in_ptr = data_in_ptr + 1;
+    if (data_in_ptr == 8)
     {
-        counter = 0;
+        data_in_ptr = 0;
         char_to_send = bool_to_uint8(character);
         send_char();
     }

@@ -4,111 +4,23 @@
  *  Created on: 06-Mar-2017
  *      Author: arktheshadow
  */
-//#include <stdint.h>
-//#include <stdbool.h>
-//#include "inc/hw_types.h"
-//#include "inc/hw_memmap.h"
-//#include "driverlib/gpio.h"
-//#include "driverlib/uart.h"
-//#include "driverlib/pin_map.h"
-//#include "driverlib/sysctl.h"
-//#include "inc/hw_ints.h"
-//#include "driverlib/interrupt.h"
-//#include "driverlib/timer.h"
-#include <stdbool.h>
 #include <stdint.h>
-#include "inc/hw_ints.h"
-#include "inc/hw_memmap.h"
+#include <stdbool.h>
 #include "inc/hw_types.h"
-#include "driverlib/debug.h"
-#include "driverlib/fpu.h"
+#include "inc/hw_memmap.h"
 #include "driverlib/gpio.h"
-#include "driverlib/interrupt.h"
+#include "driverlib/uart.h"
 #include "driverlib/pin_map.h"
 #include "driverlib/sysctl.h"
-#include "driverlib/systick.h"
+#include "inc/hw_ints.h"
+#include "driverlib/interrupt.h"
 #include "driverlib/timer.h"
-#include "driverlib/uart.h"
-#include "driverlib/rom.h"
-#include "usblib/usblib.h"
-#include "usblib/usb-ids.h"
-#include "usblib/device/usbdevice.h"
-#include "usblib/device/usbdbulk.h"
-#include "utils/uartstdio.h"
-#include "utils/ustdlib.h"
-#include "usb_bulk_structs.h"
 
-//extern uint32_t
-
-
-int32_t data_in[2048];
+int32_t data_in[6144];
 int32_t see_bit[2];
 int32_t data_in_ptr;
-int32_t rx_back = 0;
 
 int falling_edges_count = 0;
-
-void send_to_pc()
-{
-    data_in_ptr = 0;
-    data_in[data_in_ptr++] = 0;
-    data_in[data_in_ptr++] = 0;
-    data_in[data_in_ptr++] = 0;
-    data_in[data_in_ptr++] = 0;
-    data_in[data_in_ptr++] = 1;
-    data_in[data_in_ptr++] = 1;
-    data_in[data_in_ptr++] = 0;
-    data_in[data_in_ptr++] = 0;
-
-    uint32_t ui32Loop, ui32Space, ui32Count;
-//    uint32_t ui32ReadIndex;
-    uint32_t ui32WriteIndex;
-    tUSBRingBufObject sTxRing;
-    uint32_t ui32NumBytes = data_in_ptr - rx_back;
-    ui32NumBytes = 10;
-    USBBufferInfoGet(&g_sTxBuffer, &sTxRing);
-    ui32Space = USBBufferSpaceAvailable(&g_sTxBuffer);
-    ui32Loop = (ui32Space < ui32NumBytes) ? ui32Space : ui32NumBytes;
-    ui32Count = ui32Loop;
-//    g_ui32RxCount += ui32NumBytes;
-
-//    ui32ReadIndex = (uint32_t)(pui8Data - g_pui8USBRxBuffer);
-    ui32WriteIndex = sTxRing.ui32WriteIndex;
-
-//    while(1)
-////    {
-    int i = 0;
-    int a = 0;
-//    int b = 1;
-    for(i = 0; i < 8;i++)
-    {
-        a = a +(1<<i)* data_in[rx_back++];
-    }
-    g_pui8USBTxBuffer[ui32WriteIndex] = a;
-    USBBufferDataWritten(&g_sTxBuffer,1);
-//        while(ui32Loop)
-//            {
-//                int x1 = 0;
-//                for(i)
-//                g_pui8USBTxBuffer[ui32WriteIndex] = data_in[rx_back++];
-//                ui32Loop--;
-//            }
-//            USBBufferDataWritten(&g_sTxBuffer, ui32Count);
-//            if(rx_back == counter)
-//            {
-////                break;
-//                return;
-//            }
-//            else
-//            {
-//                ui32NumBytes = counter - rx_back;
-//                ui32Space = USBBufferSpaceAvailable(&g_sTxBuffer);
-//                ui32Loop = (ui32Space < ui32NumBytes) ? ui32Space : ui32NumBytes;
-//            }
-//    }
-
-
-}
 
 void init_zero()
 {
@@ -141,11 +53,6 @@ void gpiob_interrupt_handler()
 //    data_in[counter] =
     data_in[data_in_ptr] = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_1);
 //    data_in[counter] = data_in[counter] >> 1;
-
-    if(data_in_ptr > 2000)
-    {
-        send_to_pc();
-    }
 
     if (data_in_ptr % 2 == 1)
     {

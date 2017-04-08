@@ -47,6 +47,10 @@ bool clk = 0;
 void send_data(int);
 void tx_byte(uint8_t);
 uint8_t byte_test = 0b11001010;
+
+//bool start_timer_bit = 0;
+void timer0_interrrupt_handler();
+
 void config_GPIO()
 {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
@@ -55,14 +59,14 @@ void config_GPIO()
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1);
     //PIN 0 : External Clock
     //Pin 1 : Data from the PLL
-    GPIOPinTypeGPIOInput(GPIO_PORTB_BASE, GPIO_PIN_0|GPIO_PIN_1);
+//    GPIOPinTypeGPIOInput(GPIO_PORTB_BASE, GPIO_PIN_0|GPIO_PIN_1);
 //    GPIOPinTypeGPIOInput(GPIO_PORTC_BASE, GPIO_PIN_4);
-    GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_3|GPIO_PIN_4);
-    GPIOIntDisable(GPIO_PORTB_BASE, GPIO_PIN_0);
-    GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_0);
+    GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_3|GPIO_PIN_0);
+//    GPIOIntDisable(GPIO_PORTB_BASE, GPIO_PIN_0);
+//    GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_0);
 //    GPIOIntRegister(GPIO_PORTB_BASE,gpiob_interrupt_handler);
-    GPIOIntTypeSet(GPIO_PORTB_BASE,GPIO_PIN_0,GPIO_FALLING_EDGE);
-    GPIOIntEnable(GPIO_PORTB_BASE,GPIO_PIN_0);
+//    GPIOIntTypeSet(GPIO_PORTB_BASE,GPIO_PIN_0,GPIO_FALLING_EDGE);
+//    GPIOIntEnable(GPIO_PORTB_BASE,GPIO_PIN_0);
 
 //    GPIOIntDisable(GPIO_PORTC_BASE, GPIO_PIN_4);
 //    GPIOIntClear(GPIO_PORTC_BASE, GPIO_PIN_4);
@@ -74,15 +78,35 @@ void config_GPIO()
 
 }
 
+void config_timer()
+{
+//    int max_clock_count = 100000;
+//    uint32_t time_period = SysCtlClockGet()/(2*max_clock_count);
+    uint32_t  time_period = 250;
+
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0); // Enable Timer 0 Clock
+    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC); // Configure Timer Operation as Periodic
+    TimerIntRegister(TIMER0_BASE, TIMER_A, timer0_interrrupt_handler);
+    TimerLoadSet(TIMER0_BASE, TIMER_A, time_period);
+    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+
+
+//    IntMasterEnable();
+//    TimerEnable(TIMER0_BASE, TIMER_A); // Start Timer 0A
+}
+
 void timer0_interrrupt_handler()
 {
 //    send_data(3);
     TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
 
-//    tx_byte(0b11001010);
-//    send_data(3);
-//    GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_3, data_to_tx[tx_back++] << 3);
-//    SysCtlDelay(cl_delay);
+    GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0, data_to_tx[tx_back++]);
+    if (tx_back == tx_front)
+    {
+        tx_back = 4000;
+    }
+
+
 }
 
 void timer1_interrupt_handler()
@@ -91,7 +115,6 @@ void timer1_interrupt_handler()
     GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_4, clk << 4);
     clk = !clk;
 }
-
 
 void send_data(int n)
 {
@@ -105,7 +128,9 @@ void send_data(int n)
 //        tx_back = tx_back%tx_front;
         if(tx_back == tx_front)
         {
-            tx_back = 3998;
+//            tx_back = 3998;
+            tx_back = 4000;
+//            TimerIntDisable()
         }
         else
         {

@@ -1,0 +1,1 @@
+"./read_data_xtal.obj" "./receiver_main.obj" "./tm4c123gh6pm_startup_ccs.obj" "./uart_rx_testing.obj" "./utils/uartstdio.obj" "./utils/ustdlib.obj" "/home/arktheshadow/ti/SW-EK-TM4C123GXL-2.1.3.156/driverlib/ccs/Debug/driverlib.lib" "../tm4c123gh6pm.cmd" -llibc.a 

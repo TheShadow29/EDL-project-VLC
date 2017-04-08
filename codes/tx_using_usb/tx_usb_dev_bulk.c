@@ -50,6 +50,17 @@ extern void tx_to_synch_buffer(uint8_t);
 extern void send_sync_data(int);
 extern void send_data(int);
 extern void config_GPIO();
+extern void config_timer();
+bool start_timer_bit = 0;
+extern bool *data_to_tx;
+
+uint8_t to_tx_buffer_temp[256];
+int ptr_to_tx_buffer = 0;
+extern int tx_front;
+
+uint32_t ui32Loop, ui32Space, ui32Count;
+uint32_t ui32ReadIndex;
+uint32_t ui32WriteIndex;
 
 
 //*****************************************************************************
@@ -203,9 +214,7 @@ static uint32_t
 NayaData(tUSBDBulkDevice *psDevice, uint8_t *pui8Data,
                   uint32_t ui32NumBytes)
 {
-    uint32_t ui32Loop, ui32Space, ui32Count;
-    uint32_t ui32ReadIndex;
-    uint32_t ui32WriteIndex;
+
     tUSBRingBufObject sTxRing;
 
     //
@@ -253,7 +262,22 @@ NayaData(tUSBDBulkDevice *psDevice, uint8_t *pui8Data,
         if (ui32ReadIndex >29)
         {
             tx_byte(g_pui8USBRxBuffer[ui32ReadIndex]);
+            start_timer_bit = 1;
+            to_tx_buffer_temp[ptr_to_tx_buffer++] = g_pui8USBRxBuffer[ui32ReadIndex];
+//            if (ui32ReadIndex > 31)
+//            {
+//                if (to_tx_buffer_temp[ptr_to_tx_buffer] == 'B' && to_tx_buffer_temp[ptr_to_tx_buffer-1] == 'A')
+//                {
+//                    tx_front = tx_front - 16;
+//                    start_timer_bit = 1;
+////                    IntMasterEnable();
+////                    TimerEnable(TIMER0_BASE, TIMER_A); // Start Timer 0A
+//                }
+//            }
         }
+
+
+
 
         //
         // Move to the next character taking care to adjust the pointer for
@@ -356,7 +380,7 @@ RxHandler(void *pvCBData, uint32_t ui32Event,
         case USB_EVENT_CONNECTED:
         {
             g_bUSBConfigured = true;
-            UARTprintf("Host connected.\n");
+//            UARTprintf("Host connected.\n");
 
             //
             // Flush our buffers.
@@ -384,15 +408,7 @@ RxHandler(void *pvCBData, uint32_t ui32Event,
         {
             tUSBDBulkDevice *psDevice;
 
-            //
-            // Get a pointer to our instance data from the callback data
-            // parameter.
-            //
             psDevice = (tUSBDBulkDevice *)pvCBData;
-
-            //
-            // Read the new packet and echo it back to the host.
-            //
             //return(EchoNewDataToHost(psDevice, pvMsgData, ui32MsgValue));
             return(NayaData(psDevice, pvMsgData, ui32MsgValue));
         }
@@ -464,8 +480,10 @@ int main(void)
     volatile uint32_t ui32Loop;
     uint32_t ui32TxCount;
     uint32_t ui32RxCount;
+    start_timer_bit = 0;
 
     config_GPIO();
+    config_timer();
 
     //
     // Enable lazy stacking for interrupt handlers.  This allows floating-point
@@ -495,7 +513,7 @@ int main(void)
     //
     // Open UART0 and show the application name on the UART.
     //
-    ConfigureUART();
+//    ConfigureUART();
 
     UARTprintf("\033[2JTiva C Series USB bulk device example\n");
     UARTprintf("---------------------------------\n\n");
@@ -563,12 +581,14 @@ int main(void)
             tx_byte(0x00);
             t_j--;
         }
-        t_j = 48;
+        t_j = 24;
         while(t_j)
         {
 //            tx_byte(0b11101110)
-            tx_byte(0b10011100);
+//            tx_byte(0b10011100);
 //            tx_byte(0x00);
+            tx_byte('C');
+            tx_byte('D');
 //            tx_byte(0xD6);
             t_j--;
         }
@@ -577,75 +597,12 @@ int main(void)
     // Main application loop.
     //
 //        send_sync_data(3);
-
+//        IntMasterEnable();
+//        TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+    IntMasterEnable();
+    TimerEnable(TIMER0_BASE, TIMER_A); // Start Timer 0A
     while(1)
     {
-        //
-        // See if any data has been transferred.
-        //
-        send_data(3);
-//        if((ui32TxCount != g_ui32TxCount) || (ui32RxCount != g_ui32RxCount))
-//        {
-//            //
-//            // Has there been any transmit traffic since we last checked?
-//            //
-//            if(ui32TxCount != g_ui32TxCount)
-//            {
-//                //
-//                // Turn on the Green LED.
-//                //
-//                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, GPIO_PIN_3);
-//
-//                //
-//                // Delay for a bit.
-//                //
-//                for(ui32Loop = 0; ui32Loop < 150000; ui32Loop++)
-//                {
-//                }
-//
-//                //
-//                // Turn off the Green LED.
-//                //
-//                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, 0);
-//
-//                //
-//                // Take a snapshot of the latest transmit count.
-//                //
-//                ui32TxCount = g_ui32TxCount;
-//            }
-//
-//            //
-//            // Has there been any receive traffic since we last checked?
-//            //
-//            if(ui32RxCount != g_ui32RxCount)
-//            {
-//                //
-//                // Turn on the Blue LED.
-//                //
-//                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, GPIO_PIN_2);
-//
-//                //
-//                // Delay for a bit.
-//                //
-//                for(ui32Loop = 0; ui32Loop < 150000; ui32Loop++)
-//                {
-//                }
-//
-//                //
-//                // Turn off the Blue LED.
-//                //
-//                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, 0);
-//
-//                //
-//                // Take a snapshot of the latest receive count.
-//                //
-//                ui32RxCount = g_ui32RxCount;
-//            }
-//
-//            //
-//            // Update the display of bytes transferred.
-//            //
-//            //UARTprintf("\rTx: %d  Rx: %d", ui32TxCount, ui32RxCount);
-//        }
+
     }
 }
