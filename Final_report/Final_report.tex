@@ -5,9 +5,13 @@
 \usepackage{parskip}
 \usepackage{pdflscape}
 \usepackage{listings}
+\usepackage{enumitem}
+\usepackage[normalem]{ulem}
+\usepackage{mathtools}
+\usepackage{hyperref}
 % \usepackage{float}
-%\usepackage{hyperref}
-%\usepackage{titlesec}
+% \usepackage{hyperref}
+% \usepackage{titlesec}
 
 \newcommand{\ra}{$\rightarrow$}
 
@@ -32,7 +36,7 @@ project will consist of a transmitter, a LED in this case, which will transmit t
 which will be received by the receiver. The data transmitted would be read from a file.
 \newpage
 \tableofcontents
-
+\newpage
 \section{Chapter 1 : Introduction}
 % Give Project objective, Block diagram, Motivation for the work
 \subsection{Project Objective}
@@ -41,14 +45,30 @@ The project aims at developing a prototype to establish a commununication link w
 
 \subsection{Motivation for the Work}
 The previous decade has seen a tremendous technological growth in the field of mobile services, Wifi and applications in the field of Internet of Things. 
-
-
-\begin{itemize}
-\item 
-\end{itemize}
 \section{Chapter 2 : Project Design}
 % Give details of the system design, choice of sub systems and other design
-% steps/strategy
+% steps/strateg
+The design of project is aimed at establishing a communication link using the visible light where the data is taken from a file, sent over the link and again stored in a file at the receiving end. The challenge is not only in designing the hardware and the software systems individually but also design and implement a seamless integration between the two. In terms of hardware, a typical communication system has two parts, one each on the transmission and the reception end. Also to ensure synchronous transmission of data, the complexity of the receiver increases. Thus keeping in mind the above broad categorizations, the Hardware Module of the Project essentially consists of 4 sub systems, namely:
+\begin{itemize}
+\item The Transmitter Circuit
+\item The Receiver Circuit
+\item The Clock Synchronisation Circuit
+\item The Power Supply
+\end{itemize}
+
+The second and the third part together form the hardware at the receiver while the fourth system is essentially added to make the system portable.\\
+The transmitter circuit has to essentially take the input data and send it over the link. The receiver circuit is designed to capture the data from the link and filter and process the waveform. The clock synchronisation part,as the name suggests, enable the synchronous reception of data by recovering the clock. For the ease of understanding, the Clock Synchronisation Circuit can further be sub-divided into
+\begin{itemize}
+\item Differentiator
+\item PLL
+\item Manchester Decoder
+\end{itemize}
+
+In addition to this hardware part,  we have a software part. At the transmission end, the data from a file is read via a USB into the tivaC board, where the data is encoded using Manchester encoding, and then sent out on a pin at the required frequency. The output of this pin is serves as the input to the transmitter circuit. 
+
+At the receiving end, the hardware itself does the decoding and hence it is just required for the tivaC to read the data and collect it and send it over the USB link to the computer at the receiving end.
+
+
 
 \section{Chapter 3 : Project Implementation}
 % Give details of the various subsystems (include neat circuit diagrams (no
@@ -56,15 +76,128 @@ The previous decade has seen a tremendous technological growth in the field of m
 % Please do not give listing of your code in the report. Instead add
 % comments to your code and upload it on YAWP (after the Final demo). We
 % shall involve the TA/RA associated with your project for this step.
+\subsection{The Transmitter Circuit}
+The Transmitter circuit takes the data (to be sent) as the input from the TivaC board and drives the LED according to the input data. The circuit is a simple one comprising mainly a LED driver  and resistor to control the intensity of the light.\\
+Our implementation of the circuit uses the IC SN7440N which is a dual quad input NAND gate to drive the signal. There are pull up resistors at the input and similarly pull down resistors at the output to control the amplitude of the driven signal and hence the average intensity of the LED.\\
+This is an essential factor because often in VLC applications the primary application of the light source is not communication but rather is to provide illumination. Thus it is essential that we should not be affecting the primary purpose in order to achieve the dual motive. Another reason that necessitates control of average intensity is the sensitivity of the photodiode. Often the photodiode that is used is sensitive in a range of intensities and tends to underperform or saturate if we use it outside this range Thus depending on the distance between the transmitter and the receiver we might have to tune these values. For the LED driver any simple logic gate can be used with appropriate function. We have employed a NAND gate for the purpose because of its low resistance of the NAND gate when a low logic is driven at the output which ensures that the output is not affected.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PICTURE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Receiver Circuit}
+The Receiver Circuit, as the name suggests, corresponds to the hardware at the receiving end of the signal that is used to capture the signal and retrieve it. In essence, this circuit captures the data, amplifies the captured signal, filters the noise to retrieve the waveform which can be used for clock synchronisation.
+
+The light is captured by a photodiode which generates a current whose magnitude is proportional to the intensity of the light falling on the photodiode. It is essential to note that there is a range of intensities where the performance of photodiode is good and it should be ensured that the diode is operated in this range so that output is not saturated.
+
+Our implementation of the circuit uses BPW34 photodiode for this purpose. One of the main reasons to use this was because this had a reasonably small fall and rise time of about $100ns$ which would enable us to operate at higher frequency ranges to quickly switch data enabling better data rates. The photodiode gives a very small current of the order of microamperes$(10^{-6}\text{A})$ which has to be amplified before using it. Hence the current is passed through a large resistor to amplify the voltage which is connected to a voltage buffer to further use this voltage. The buffer ensures isolation of the remaining part of the circuit the above. This is essential because the current in this part of the circuit is very low which might get affected by the other parts in the circuit if it were to be connected directly.
+
+The buffer is made using a standard OPAMP implementation of the same by using a TL082. The OPAMP also support high switching rates and thus must have a high slew rate so that the data does not get affected. With a slew rate of $13V/us$ TL082 was a good choice for the purpose. The received waveform is corrupted with noise which has to be filtered out.
+
+Interestingly, this application does not have a noise in the high frequency range but instead has in the low frequency range. This is primarily because the noise added to the system comes from the ambient light falling on the photodiode. The fluctuations in the intensity have a frequency component equal to that of frequency of the supply equal to 50Hz. Thus it is essential to remove the 50Hz component from the received signal. If this not done, then the waveform looks like a actual one modulated on a very low frequency wave (which actually corresponds to the 50 Hz).  Thus the waveform is passed through a simple RC high pass filter with a cutoff frequency of $700 Hz$.
+
+The waveform at this point has been affected and loses it rectangular shape. To ensure recovery of the original rectangular waveform, the output is passed through a comparator. The comparator used here is LM361 which works very well upto $1 MHz$ which is well above the required range. The output of the comparator is then fed to the clock synchronisation and frequency correction circuit.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PICTURE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{The Clock Synchronisation and Frequency Correction Circuit}
+The Clock Synchronisation and Frequency correction functions to extract the clock from the received signal and synchronize the extracted the clock with the received signal. This particular step is essential as we need to obtain a reference clock with respect to which  we will sample the received data. Not just that, the reference needs to be the aligned in such a manner such that correct sampling occurs, that is, the data is sampled at the correct instant.
+
+The above circuit consists of 3 sub-circuits :
 \begin{itemize}
-\item Software Details
-  \begin{itemize}
-  \item 
-  \end{itemize}
+\item \textbf{The Differentiator Circuit}
+\item \textbf{The Phase Lock Loop (PLL) Circuit}
+\item \textbf{The Decoder}
 \end{itemize}
+It is useful to discuss the working of the PLL circuit as it will help explain the working of the entire clock recovery and data decoding circuit.
+
+\begin{enumerate}[label=(\Alph*)]
+\item The Working of PLL
+%%%%%%%%%%%%%%%%%%%%%TO BE Completed%%%%%%%%%%%%%%%%%%%
+\item \textbf{The PLL Clock Synchronisation Step}\\
+  It is necessary for the PLL to determine the rate at which the data is going to be sent to it in order to generate a clock to sample the data (as explained above). Hence, a sequences of 1’s and 0’s need to be sent to the PLL, before the actual data is sent, so that it can determine the clock at which data is being transmitted. This step is called the “Synchronisation Step”. 
+
+The question which follows immediately is how does the PLL circuit remember the clock once the actual data starts getting transmitted. As mentioned earlier, the data sent and received will be Manchester encoded. And obviously, the data will be a sequence of 1’s and 0’s which will be aperiodic. The transitions from high to low can take place at any time depending on the data being sent. The PLL is not supposed to respond to EVERY transition but only to a selected number of transitions which are periodic and correspond to the actual frequency of the data sent. An example is shown below.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55% *PIC* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As it can be seen in the picture shown above, if the differentiator captures every high to low transition, a waveform will be obtained which corresponds to the signal B. But the transitions, which corresponds to the actual clock, that is the ones which PLL actually needs to receive at its input are circled in the signal B. So the primary question is how to get rid off the unwanted the unwanted transitions?  
+The answer lies in the special feature of PLL IC CD4046B called the Phase Comparator II
+
+\item \textbf{The Phase Comparator II}\\
+  Phase Comparator II is an edge controlled digital memory network. The comparator acts only on the positive edges of the data signals and comparator input signals. The duty cycle of signal and comparator inputs are, thus, NOT important. If the frequencies and phases of the input and output signal do not match, then the capacitor voltage increases or decreases correspondingly (according to the working of PLL explained above) such that the frequencies and phase become equal. The main point to be noted here is that Phase Comparator II has MEMORY! During the ON intervals, that is when the pulse is present at the input of PLL, it provides the clock output as it should. But during the OFF intervals, that is the scenario where the pulse is NOT present at the desired time instant, the Phase Comparator II remembers the old clock and provides the previous clock output! This fact is utilized to remember the clock during the transition of moving from the synchronization pulse to the beginning of actual data transmission.
+
+With the above knowledge, the working of the entire circuit can now be explained.
+
+% \includegraphics[scale=0.5]{images/PLL_diagram}
+
+\item \textbf{The Differentiator Circuit}\\
+  As described in the phase comparator II section, the phase comparator II of the PLL responds only to the positive edges of the data input signal (or the comparator input signal). Thus, the differentiator is used in order to get pulses corresponding to the rising and the falling edges of the data. The reason for considering both the rising and falling edge transitions is that in the manchester encoded “0”, that is, half cycle low and half cycle high bit, the low to high transition corresponds to the actual clock signal to be extracted ( for example, the first and the third peak in signal B of the diagram) while in the manchester encoded “1”, that is, first half cycle high and next half cycle low bit, the high to low transition corresponds to the actual clock signal to be extracted ( for example, the fourth and the sixth peak in signal B of the diagram). Hence, differentiator is used to give pulses at both the edges.
+
+\item \textbf{The PLL Circuit}\\
+  The PLL Circuit consists of the IC 4046B, FF1 and FF2 as shown in the above diagram. The data signal input of PLL circuit is the output of the AND gate. Assuming that the input signal correspond to the pulses of the actual clock underlying of the data (reason to the provided later), the output of the VCO is a clock at twice the data frequency. The reason is that the VCO output is passed through the FF1 which divides the frequency of VCO output by 2. The output of FF1, which corresponds to signal C in the above diagram, is fed to the comparator input signal of PLL. Since locking takes place between the data input signal and comparator input signal, thus, the frequency of the comparator input should be same as that of data. And thus, the frequency of VCO output turns out to be twice the frequency of data because of the voltage divider present in between.
+
+  The idea behind keeping a frequency divider after the VCO output revolves around the fact that the PLL circuit needs another signal, whose clock is 90 degrees phase shifted with the actual clock in order to select only those output pulses of the differentiator which correspond to the actual clock. See the signals B, C and D in the above figure together. B contains pulses at all those instants where a transition has taken place in the data signal. C has the same phase and frequency as the input signal. D is 90 degree shifted version of C. The question which remains to be answered is how does C correspond to the actual clock frequency and phase even after actual data has started transmitting?
+  
+The answer as described above is the magic of Phase Comparator II (PC II). When the transition took place from synchronising data to actual data, the PC II, remembered the old clock and continued to give the output C. Later, D being 90 degrees out of phase with C (precisely speaking, leading C), was “AND”ed with the output of the differentiator. Because of this, as shown in the above figure, only the pulses correspond to the actual clock survive! And thus, the PLL circuit still retains the actual clock frequency.    
+
+\item \textbf{The Decoder Circuit}
+  The decoder circuit decodes the manchester encoded signal on hardware itself. It consists of a single flip flop (FF3 in the figure) whose data input is the actual signal and clock input as signal D. As seen in the figure, the output of FF3 is signal E, which when sampled at the falling edges of signal D gives the desired manchester decoded data. 
+  
+\end{enumerate}
+
 \section{Chapter 4 : Performance Evaluation}
 % prototype details, test results,
 % problems faced (and lessons learned), etc.
+\subsection{Prototype details}
+The following the specifications of the prototype. It has a detailed explanation of each of the components and the reasons for choosing the same.
+
+\subsubsection{The transmitter circuit}
+It is a simple circuit which uses a NAND gate of the SN7440N IC. It is a dual quad-input IC. The input is connected to the power supply by a pull up resistor of $1.5k \Omega$ while the output pin is connected to the positive terminal of the LED by a $220 \Omega $ resistor. A NAND gate was used to drive the circuit primarily for the fact that it has a very low resistance when the output is driven to a low which enables it to easily sink in current and hence not distort the output. 
+\subsubsection{The receiver circuit}
+The first part of the consists of the photodiode which converts the light falling onto into electrical signals, The requirements of the photodiode was a quick response time, a spectral sensitivity in the visible spectrum and a large radiant sensitive area. The size of the
+radiant sensitive area is crucial and therefore the photodiode used was a VISHAY BPW34. The spectral bandwidth is from 430 nm to 1100 nm and gives a perfect range for the intended application. It has a linear light intensity to current ratio and the radiant sensitive area is $7.5 \text{mm}^2$ , which was larger than most photodiodes found. It has a rise
+and fall time of 100 ns each, which provides a switching frequency of $5 MHz$. This was enough since it is above the capabilities of the rest of the hardware and software.
+
+This was followed a high gain voltage follower to convert the signal into a voltage waveform and also electrically isolate it from the rest of the circuit. For this, a OPAMP based voltage follower was used with a feedback resistance of $560 k \Omega$ to ensure a high gain. Such a high gain is required because the output of the photodiode is of the order of microamperes. The value of the resistance was chosen to ensure that the output was roughly in the range of 0-5 V. The value was chosen by trial and error mainly because the datasheet does not specify the typical values of current in the frequency range of interest. The OPAMP used was TL082. The requirements of the OPAMP in such case was to have a high slew rate so that the output is distorted to a minimum level because of the frequency response of the OPAMP, a low rise and fall time so that it quickly reacts to the input waveform. TL082 with a slew rate of $13 V\mu s$ and rise  seemed to be the ideal choice.
+
+The output is then passed through a high pass filter made by using simple passive RC components. The specification of the filter design were stop frequency $ = 100 Hz$ and pass frequency $ = 5 kHz $. As a result, the transition frequency was chosen to be $ 700 Hz $ which is close to the geometric mean of the two and time constant of the circuit was designed to correspond to this frequency i.e., $ \dfrac{1}{RC} = 2 \pi \times 700 $. Using a standard value of capacitor $ =  22 nF $ we get the resistor value to be $ 10 k \Omega $. Using these values, a frequency response was plotted separately and checked. Here it is important to note that the capacitor serves dual purpose. Apart from the filter part, it also serves as a decoupling capacitor. The waveform until now was in the range of $ 0-5 \  V $ because the NAND gate switches between $0$ and $5$ V. After the capacitor the DC value of the system goes to $0$ and the voltage swings equally in the positive and the negative values.
+
+The next element was a comparator. Here an OPAMP based comparator was not sufficient because it does not perform well in the high frequency range and hence a special comparator IC was used. The specifications of the comparator should have been to reach upto $ 750 kHz $ without distortion. LM 361 has a maximum delay of $20 ns$ and hence more than meets the specifications and is ideal for the purpose.
+
+\subsubsection{PLL Circuit}
+
+\subsection{Test Results}
+The following tests were conducted to verify the individual components of the complete circuit.
+\subsubsection{Transmitter circuit}
+The circuit was not complicated and hence a simple test was conducted to ensure that the output follows the input without any phase difference. The output was voltage on the pin that was driving the LED.
+\subsubsection{Receiver circuit}
+Again for this circuit a simple point by point debugging method was employed. Since the current at the output of the photodiode is very low and not measurable by simple lab instruments like DMM hence directly the voltage after passing it through a large resistor was measured. Then specifically the working of the voltage buffer was tested. All the tests upto this point were conducted by sending a pattern of alternating 0s and 1s via transmitter which had been tested previously. The output at this point is slightly distorted wave of high frequency modulated over a wave of very low frequency which is essentially the 50Hz noise due to ambient light. To filter out this noise, we pass this through a high pass filter and we find that the wave becomes stable with a zero DC value. However, the wave is distorted due to imperfect frequency response of the OPAMP and the channel. The waveform is input to the comparator. To test this out we ensured that the comparator was giving the correct output and the zeros of the distorted waveform and output of the comparator matched. This is essential because it ensures that the bit width is not affected and there is no phase lag either. This is how we implemented a simple and effective point by point debugging method for the receiver circuit.
+\subsubsection{Clock Synchronization and Data Recovery Circuit}
+Since this is the most complex circuit as a whole, step-by-step testing was unavoidable.
+\begin{enumerate}[label=(\alph*)]
+\item Testing of the Differentiator - A square wave was given at the input of the Differentiator circuit, and verification of the working was done by observing whether pulses were seen at the transitions of the square wave 
+\item Testing of the VCO - According to the figure shown below, appropriate values of R1,R2 and C1 need to be chosen in order to determine the lock/capture range of the PLL. To test that the lock/capture range was set as desired, the input of VCO, pin 9 of PLL was grounded in order to get the minimum frequency and later set High in order to get the maximum frequency and thus, the entire lock/frequency range.
+\item Testing of the PLL on Square Inputs - In order to test only the PLL circuit, without the flip flops, a signal of frequency within the lock/capture range, was given at the input of PLL, the VCO output was shorted with the Comparator signal input to see whether the PLL locked on simple signals.
+\item Testing the PLL Circuit with Flip Flops - The Entire PLL circuit, without the Differentiator and Decoder was tested next. Instead the output of AND Gate, again a square signal was given to the input pin 14 of PLL. Verification was done whether signal C and signal D were obtained as desired according to figure *
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PICTURE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item Testing the PLL Circuit along with Differentiator and  Encoder-Finally, entire circuit connected in order to form a closed loop. A square pulse followed by a psuedo random sequence was given at the input of the differentiator and signals corresponding to B, C, D were observed. Expected desired observations confirmed the working of the clock synchronisation and Data recovery circuit.
+\end{enumerate}
+\subsection{Problems faced}
+ As in any engineering task, we also faced a number of issues during the course of our project. The problem extended from design issues to the implementation specifics of the different parts of the hardware and software. 
+\begin{enumerate}
+\item One of the initial problems faced initially was with the driver circuit. Initially, the LED was driven using an inverter, 7404. The problem was that when the output had to be driven high, the impedance of the PMOS used to drive the voltage was high and hence was distorting the waveform.
+\item Initially for the high pass filter, a fifth order circuit was employed with a cut off of 10kHz. This was affecting the performance of the receiver circuit. This was because of the two additional OPAMP being introduced which were affecting frequency response of the circuit in the high frequency range because of their natural response. Hence as a solution to this, a simple RC filter design was adopted and integrated into the system.
+\item \textbf{Differentiator}:
+  \begin{itemize}
+  \item This part of the circuit caused a lot of issued in implementation aspect. Initially, an OPAmp based differentiator was designed, however, it gave very thin pulses on the edges and of opposite signs on the different edges. An attempt was made to rectify the same using a diode rectifier which didn’t quite give the required results probably due to the capacitive effects of the diode.
+  \item Next, another implementation was tried by passing a signal and its delayed version through an AND gate. The delay was obtained by using a NOT gate. However, this circuit failed again, much owing to thin pulses due to very short delay because of NOT gate and it also had another issue that it gave pulses only on the rising edge of the pulse.
+  \item To counter the delay issue, an RC delay was added to increase the width of the pulse. And to add the negative edges also, the signal was passed through a NOT gate and procedure was repeated and the net signal was obtained by an OR of the two signals.
+  \item This had couple of other issues. One, that size of the pulses was not equal on both the edges, which had been solved by using the OR of signal and its NOT. The second was that the amplitude of the pulses on the negative and positive edges were different and was rectified by passing the signal with lower amplitude by two NOT gates.
+  \end{itemize}
+\item \textbf{PLL}
+  \begin{itemize}
+  \item This was an issue faced in the initial stages of designing a PLL circuit. Initially the input to the PLL circuit had a zero DC bias and the waveform was swinging between $-2 V$ and $ 2 V$. However, it was later realised that the PLL did not work for such signals. Nowhere this caution was mentioned in the documents that had been referred. For this purpose, the voltages at the comparator were changed to ensure that the output is between $0$ and $5 V$.
+  \item Another issue was faced was during the integration of the hardware and software. The PLL circuit had been designed and tested independently and had been locking with the clock. To try for arbitrary sequences the input had to be taken from a tivaC which would send a synchronising pulse followed by an arbitrary pulse. It was found that PLL was not locking wherein it was supposed to. After a lot of debugging, it was realised that even if the arbitrary sequence was a sequence of alternating $1$s and $0$s, the PLL was not getting locked. Further, it was realised that the frequency at which the tiva was sending the synchronisation pulse and the arbitrary sequence were different because they had been called from different functions which took different amounts of time to be executed. This software bug was resolved by making it the same function and which then ensured that the PLL locked even on arbitrary sequences.
+  \end{itemize}
+\end{enumerate}
+
 \section{Chapter 5 : Conclusion and suggestions for future work}
 
 
