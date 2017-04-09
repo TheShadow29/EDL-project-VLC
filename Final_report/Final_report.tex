@@ -13,6 +13,11 @@
 % \usepackage{hyperref}
 % \usepackage{titlesec}
 
+%% To do:
+%% > Which led used
+%% > Manchester Encoding ?
+%% 
+
 \newcommand{\ra}{$\rightarrow$}
 
 
@@ -64,21 +69,41 @@ The transmitter circuit has to essentially take the input data and send it over 
 \item Manchester Decoder
 \end{itemize}
 
-In addition to this hardware part,  we have a software part. At the transmission end, the data from a file is read via a USB into the tivaC board, where the data is encoded using Manchester encoding, and then sent out on a pin at the required frequency. The output of this pin is serves as the input to the transmitter circuit. 
+In addition to this hardware part,  we have a software part. At the transmission end, the data from a file is read into the tivaC board, where the data is encoded using Manchester encoding, and then sent out on a pin at the required frequency. The output of this pin is serves as the input to the transmitter circuit.
 
-At the receiving end, the hardware itself does the decoding and hence it is just required for the tivaC to read the data and collect it and send it over the USB link to the computer at the receiving end.
+At the receiving end, the hardware itself does the decoding and hence it is just required for the tivaC to read the data and collect it and send it over the USB link to the computer at the receiving end. A shift register is used so that four pins can be read simultaneously. A protocol for starting and stopping the reception is also implemented. % The protocol and the shift register ensure that the bit error do not propagate. 
 
+\subsection{Software Tools}
+\subsubsection{Why TivaC}
+We have used the board EK-TM4C123GXL TivaC (by Texas Instruments) for our project. Apart from its easy availability and being relatively cheap it has a wide array of features which were applicable to the project. It has an extremely fast processor and can work at speeds upto 80MHz (note: not instruction cycle). It has a large RAM of $32\text{KB}$ for data storage and $256\text{KB}$ for non-volatile storage which is extremely helpful especially for debugging purposes. It also easily supports the UART and we initially tested all our basic hardware using UART to ensure that there were no data loss at preliminary stages. Its main advantage is that it has support for PWM and USB Host functionality. The latter is extremely crucial for our project application. In total two TivaC have been used, one for Transmitter and another for Receiver.
 
+\subsubsection{Why Code Composer Studio}
+For all software coding and debugging purposes Code Composer Studio (CCS) has been used. CCSv7 (latest version) is an IDE for developing applicaitons on Texas Instruments (TI) embedded processors (like TivaC). There are a couple of other options like the Energia IDE, but there are quite a few advantages in using CCS. One of the most used feature of this IDE is the option for hardware debugging, which basically means that we can directly stop the code on a hardware breakpoint or a manual pause and stop. Also it is possible to have a look at Memory Map and all the current values of the variables at the breakpoint, save the current values to a file and a lot more. The main disadvantage if any would be the slightly steep initial learning curve but this is compensated by the extensive documentation and an extremely friendly and responsive online community. A few (difficult to remove) bugs are also mentioned in the report. 
 
+\subsubsection{Communicating with the Serial Port}
+There are two popular ways to communicate with the Serial port (though they are the same essentially). First, use a HyperTerminal or PuTTY or Cutecom any other similar client. With a clean gui, it can be directly used to communicate with the TivaC. Second, being using a python library. Two popular libraries would be PySerial and PyUSB. While this requires some knowlege of Python, it can pretty much be said to be self-content, in that with minimal learning, it can be used. Both methods have their merits and demerits. While the first one is extremely very easy to use, not much can be extended from it, and for applications like file transfer it is recommended to write the whole thing from scratch. Similarly for the second, it seems slightly daunting at first, but after knowing the pre-requisites, it can be effiiciently used for code debugging. For our purposes PySerial and PyUSB worked well.
 \section{Chapter 3 : Project Implementation}
 % Give details of the various subsystems (include neat circuit diagrams (no
 % hand drawn diagrams please) with component values, photographs).
 % Please do not give listing of your code in the report. Instead add
 % comments to your code and upload it on YAWP (after the Final demo). We
 % shall involve the TA/RA associated with your project for this step.
+\subsection{Communication Protocol}
+We have used On-Off Keying (OOK) along with Manchester encoding. On-Off keying is simply giving 5V output when bit is 1 and 0V output when input is 0. While On-Off Keying has the disadvantage of lessening the average value of the light and hence reducing the intensity, its simplicity of implementation and debugging were the primary motivations behind the choice.
+
+Manchester Encoding simply encodes bit 1 as 10 and 0 as 01. The Manchester encoding on top off OOK naturally applies to the PLL circuit, and the PLL circuit directly gives us the manchester decoded output and this was our prime motivation for using this encoding.
+
+For Transmission initially a sequence of 0s is sent, which when manchester encoded gives a sequence of 01, and helps in locking of the PLL. Then a start sequence is sent and then the actual data to be sent, and a terminating message. These sequences are known to both the Transmitter and the Reciever, and therefore the Reciever knows when to start saving the data and when to terminate. 
+
+\subsection{Transmitter Code}
+The job of the transmitter (TivaC) is to send manchester encoded bits to the Transmitter circuit periodically. While this seems to be a trivial task at first using a Timer Interrupt there are some problems especially because of the USB link. The TivaC has a USB receive buffer which gets filled when anything is sent from the PC. This transmission is achieved using Pyserial and PyUSB. When the TivaC receives data from the PC it immediately goes into the receive handler interrupt which then uses the received bits and stores it into its memory. This funcion disrupts the normal transmission using the Timer Interrupt and as a result the whole hardware goes hayway. There are also many other issues like the initial 30 bytes received by the TivaC are garbage value and there needs to be some buffer (3-4 seconds) between connecting the USB and sending the bits from PC. For testing purposes it is best to HardCode the file into TivaC, as mentioned the TivaC has a sufficiently large non-volatile memory.
+
+Once what data is to be transmitted is known, the transmitter manchester encodes the data and stores it into a buffer. It initially sends a synchrnoising sequence which is used by the PLL for locking, and once the PLL is locked, it keeps on sending the data to be transmitted in a circular manner (implemented as a circular array). Few additional bits are also required for the synchronous circuit to work. A start sequence and end sequence are added at the start and end respectively to the data being transmitted. This helps the receiver in deciding when to actually start capturing the data bits. 
 \subsection{The Transmitter Circuit}
-The Transmitter circuit takes the data (to be sent) as the input from the TivaC board and drives the LED according to the input data. The circuit is a simple one comprising mainly a LED driver  and resistor to control the intensity of the light.\\
-Our implementation of the circuit uses the IC SN7440N which is a dual quad input NAND gate to drive the signal. There are pull up resistors at the input and similarly pull down resistors at the output to control the amplitude of the driven signal and hence the average intensity of the LED.\\
+The Transmitter circuit takes the data (to be sent) as the input from the TivaC board and drives the LED according to the input data. The circuit is a simple one comprising mainly a LED driver  and resistor to control the intensity of the light.
+
+Our implementation of the circuit uses the IC SN7440N which is a dual quad input NAND gate to drive the signal. There are pull up resistors at the input and similarly pull down resistors at the output to control the amplitude of the driven signal and hence the average intensity of the LED.
+
 This is an essential factor because often in VLC applications the primary application of the light source is not communication but rather is to provide illumination. Thus it is essential that we should not be affecting the primary purpose in order to achieve the dual motive. Another reason that necessitates control of average intensity is the sensitivity of the photodiode. Often the photodiode that is used is sensitive in a range of intensities and tends to underperform or saturate if we use it outside this range Thus depending on the distance between the transmitter and the receiver we might have to tune these values. For the LED driver any simple logic gate can be used with appropriate function. We have employed a NAND gate for the purpose because of its low resistance of the NAND gate when a low logic is driven at the output which ensures that the output is not affected.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PICTURE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The Receiver Circuit}
@@ -94,7 +119,7 @@ Interestingly, this application does not have a noise in the high frequency rang
 
 The waveform at this point has been affected and loses it rectangular shape. To ensure recovery of the original rectangular waveform, the output is passed through a comparator. The comparator used here is LM361 which works very well upto $1 MHz$ which is well above the required range. The output of the comparator is then fed to the clock synchronisation and frequency correction circuit.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PICTURE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%PICTURE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{The Clock Synchronisation and Frequency Correction Circuit}
 The Clock Synchronisation and Frequency correction functions to extract the clock from the received signal and synchronize the extracted the clock with the received signal. This particular step is essential as we need to obtain a reference clock with respect to which  we will sample the received data. Not just that, the reference needs to be the aligned in such a manner such that correct sampling occurs, that is, the data is sampled at the correct instant.
@@ -142,6 +167,23 @@ The answer as described above is the magic of Phase Comparator II (PC II). When 
   
 \end{enumerate}
 
+\subsection{Shift Register and Receiver Code}
+The receiver circuits outputs the manchester decoded bits and the clock. This is passed through a shift register. We have chosen SN7495 as the shift register. 
+\begin{enumerate}
+\item \textbf{Shift Register}
+  The shift register has many modes and for the project serial shift left and parallel load is used, i.e. it bascially takes in a serial input and gives parallel output on 4 pins. It takes the PLL clock and data output as its input and synchronously gives output the current 4 bits of the data.
+\item \textbf{Reciever Code}
+  The receiver has 4 pins from the shift register going into its 4 gpio pins. The clock is also sent to a gpio pin of the TivaC, and a gpio interrupt on this pin is initialized with the interrupt being called at the rising edge. When a rising edge is detected an interrupt function handler is called which then reads the 4 gpio pins to get the data of the shift register. 
+  
+  The receiver (TivaC) initially checks for a start sequence. When this start sequence is found it knows that anything after this will be valid data. Since the shift register gives 4 pin output, the reciever checks in multiples of 4 and uses those data for making up a whole byte. This is done with respect to the start sequence that is after every $4^{th}$ clock cycle it checks whether or not to read the data or not. Thus at every $(4k+1)$ rising edge it receives the lower nibble and at every $(4k)$ rising receives the higher nibble and combines them to form a byte and increments the array pointer.  
+
+  At the same time it also checks if the end sequence has come. Once it sees the end sequence it disables the interrupt. Here also all the problems associated with the USB creep in. Hence we need to make sure that the USB interrupts are not enabled before everything is received.
+
+  Once everything is received it sends the received data to the PC using USB link.
+\end{enumerate}
+
+
+
 \section{Chapter 4 : Performance Evaluation}
 % prototype details, test results,
 % problems faced (and lessons learned), etc.
@@ -168,20 +210,48 @@ The following tests were conducted to verify the individual components of the co
 \subsubsection{Transmitter circuit}
 The circuit was not complicated and hence a simple test was conducted to ensure that the output follows the input without any phase difference. The output was voltage on the pin that was driving the LED.
 \subsubsection{Receiver circuit}
-Again for this circuit a simple point by point debugging method was employed. Since the current at the output of the photodiode is very low and not measurable by simple lab instruments like DMM hence directly the voltage after passing it through a large resistor was measured. Then specifically the working of the voltage buffer was tested. All the tests upto this point were conducted by sending a pattern of alternating 0s and 1s via transmitter which had been tested previously. The output at this point is slightly distorted wave of high frequency modulated over a wave of very low frequency which is essentially the 50Hz noise due to ambient light. To filter out this noise, we pass this through a high pass filter and we find that the wave becomes stable with a zero DC value. However, the wave is distorted due to imperfect frequency response of the OPAMP and the channel. The waveform is input to the comparator. To test this out we ensured that the comparator was giving the correct output and the zeros of the distorted waveform and output of the comparator matched. This is essential because it ensures that the bit width is not affected and there is no phase lag either. This is how we implemented a simple and effective point by point debugging method for the receiver circuit.
+Again for this circuit a simple point by point debugging method was employed. Since the current at the output of the photodiode is very low and not measurable by simple lab instruments like DMM hence directly the voltage after passing it through a large resistor was measured. Then specifically the working of the voltage buffer was tested.
+
+All the tests upto this point were conducted by sending a pattern of alternating 0s and 1s via transmitter which had been tested previously. The output at this point is slightly distorted wave of high frequency modulated over a wave of very low frequency which is essentially the 50Hz noise due to ambient light. To filter out this noise, we pass this through a high pass filter and we find that the wave becomes stable with a zero DC value.
+
+However, the wave is distorted due to imperfect frequency response of the OPAMP and the channel. The waveform is input to the comparator. To test this out we ensured that the comparator was giving the correct output and the zeros of the distorted waveform and output of the comparator matched. This is essential because it ensures that the bit width is not affected and there is no phase lag either. Also for the shift register, the output of each pin was checked on the DSO to ensure its proper working.
+
+This is how we implemented a simple and effective point by point debugging method for the receiver circuit.
+
+
 \subsubsection{Clock Synchronization and Data Recovery Circuit}
 Since this is the most complex circuit as a whole, step-by-step testing was unavoidable.
 \begin{enumerate}[label=(\alph*)]
-\item Testing of the Differentiator - A square wave was given at the input of the Differentiator circuit, and verification of the working was done by observing whether pulses were seen at the transitions of the square wave 
-\item Testing of the VCO - According to the figure shown below, appropriate values of R1,R2 and C1 need to be chosen in order to determine the lock/capture range of the PLL. To test that the lock/capture range was set as desired, the input of VCO, pin 9 of PLL was grounded in order to get the minimum frequency and later set High in order to get the maximum frequency and thus, the entire lock/frequency range.
-\item Testing of the PLL on Square Inputs - In order to test only the PLL circuit, without the flip flops, a signal of frequency within the lock/capture range, was given at the input of PLL, the VCO output was shorted with the Comparator signal input to see whether the PLL locked on simple signals.
-\item Testing the PLL Circuit with Flip Flops - The Entire PLL circuit, without the Differentiator and Decoder was tested next. Instead the output of AND Gate, again a square signal was given to the input pin 14 of PLL. Verification was done whether signal C and signal D were obtained as desired according to figure *
+\item \textbf{Testing of the Differentiator}\\ A square wave was given at the input of the Differentiator circuit, and verification of the working was done by observing whether pulses were seen at the transitions of the square wave 
+\item \textbf{Testing of the VCO}\\ According to the figure shown below, appropriate values of R1,R2 and C1 need to be chosen in order to determine the lock/capture range of the PLL. To test that the lock/capture range was set as desired, the input of VCO, pin 9 of PLL was grounded in order to get the minimum frequency and later set High in order to get the maximum frequency and thus, the entire lock/frequency range.
+\item \textbf{Testing of the PLL on Square Inputs}\\ In order to test only the PLL circuit, without the flip flops, a signal of frequency within the lock/capture range, was given at the input of PLL, the VCO output was shorted with the Comparator signal input to see whether the PLL locked on simple signals.
+\item \textbf{Testing the PLL Circuit with Flip Flops}\\ The Entire PLL circuit, without the Differentiator and Decoder was tested next. Instead the output of AND Gate, again a square signal was given to the input pin 14 of PLL. Verification was done whether signal C and signal D were obtained as desired according to figure *
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PICTURE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\item Testing the PLL Circuit along with Differentiator and  Encoder-Finally, entire circuit connected in order to form a closed loop. A square pulse followed by a psuedo random sequence was given at the input of the differentiator and signals corresponding to B, C, D were observed. Expected desired observations confirmed the working of the clock synchronisation and Data recovery circuit.
+\item \textbf{Testing the PLL Circuit along with Differentiator and  Encoder} \\ Finally, entire circuit connected in order to form a closed loop. A square pulse followed by a psuedo random sequence was given at the input of the differentiator and signals corresponding to B, C, D were observed. Expected desired observations confirmed the working of the clock synchronisation and Data recovery circuit.
 \end{enumerate}
+
+% \subsubsection{Software Testing}
+\subsubsection{Transmitter code}
+\begin{itemize}
+\item \textbf{Transmitting wave}\\
+  The transmitting waveform was initially tested by seeing the waveform of the output pins on the DSO. The waveform was stabilised and hence it was concluded that the Timer Interrupt is working correctly. Also the bits were manually calculated so as to cross check that the input data was correctly encoded. 
+\item \textbf{Synchronization Sequnce Wave}\\
+  Since the transmitter initially sent a stream of 0s which manchester encoded gave a stream of 01, it was important to check if the synchrnoizing sequence and the data sequnce was being sent at the same freqeuncy. This turned out to be a very big bug in our project, as the two were different.
+\end{itemize}
+
+\subsubsection{Receiver Code}
+\begin{itemize}
+\item \textbf{Hardware Breakpoints}\\
+  Many Hardware breakpoints were used to determine the sources of error. Most of them were logical errors, and it was debugged only thanks to the almighty CCS.
+\item \textbf{Data Reception}\\
+  The most obvious and direct method of testing for receiver code was used, which is to see the bit errors in the received data. A stream of alphabets and sentences from a file were sent and there was no error in the received data buffer.
+\end{itemize}
+% \item 
+%  
 \subsection{Problems faced}
  As in any engineering task, we also faced a number of issues during the course of our project. The problem extended from design issues to the implementation specifics of the different parts of the hardware and software. 
-\begin{enumerate}
+\subsubsection{Hardware Problems}
+ \begin{enumerate}
 \item One of the initial problems faced initially was with the driver circuit. Initially, the LED was driven using an inverter, 7404. The problem was that when the output had to be driven high, the impedance of the PMOS used to drive the voltage was high and hence was distorting the waveform.
 \item Initially for the high pass filter, a fifth order circuit was employed with a cut off of 10kHz. This was affecting the performance of the receiver circuit. This was because of the two additional OPAMP being introduced which were affecting frequency response of the circuit in the high frequency range because of their natural response. Hence as a solution to this, a simple RC filter design was adopted and integrated into the system.
 \item \textbf{Differentiator}:
@@ -196,6 +266,22 @@ Since this is the most complex circuit as a whole, step-by-step testing was unav
   \item This was an issue faced in the initial stages of designing a PLL circuit. Initially the input to the PLL circuit had a zero DC bias and the waveform was swinging between $-2 V$ and $ 2 V$. However, it was later realised that the PLL did not work for such signals. Nowhere this caution was mentioned in the documents that had been referred. For this purpose, the voltages at the comparator were changed to ensure that the output is between $0$ and $5 V$.
   \item Another issue was faced was during the integration of the hardware and software. The PLL circuit had been designed and tested independently and had been locking with the clock. To try for arbitrary sequences the input had to be taken from a tivaC which would send a synchronising pulse followed by an arbitrary pulse. It was found that PLL was not locking wherein it was supposed to. After a lot of debugging, it was realised that even if the arbitrary sequence was a sequence of alternating $1$s and $0$s, the PLL was not getting locked. Further, it was realised that the frequency at which the tiva was sending the synchronisation pulse and the arbitrary sequence were different because they had been called from different functions which took different amounts of time to be executed. This software bug was resolved by making it the same function and which then ensured that the PLL locked even on arbitrary sequences.
   \end{itemize}
+\end{enumerate}
+
+\subsubsection{Software Problems}
+\begin{enumerate}
+\item \textbf{Initial Steep Learning Curve for CCS}\\
+  CCS is slightly advanced and it is daunting to learn how exaclty to use CCS. It took around 1 week to successfully setup CCSv7 and get everything to work. There were added hindrances in TivaC, which is initially not recognised as an USB device by the PC, and its vendor id and device id need to be manually added to the operating system to recognise it as a USB device.
+\item \textbf{Code for USB Transmission}\\
+  The main problem with USB link faced was that there is a garbage value of about 30 bytes between the PC and the device. Moreover it takes a significant amount of time to setup (3-4 seconds, note: compared to the processor speed). The main disadvantage of USB is that the speed of USB transmission is extremely less than that of the visible light Communication link. Moreover there a significant number of function calls that need to be made to setup a successful USB connection. This too took a lot of time to debug.
+\item \textbf{SysCtlGetClock() returns incorrect result}\\
+  When operating TivaC at 80MHz, it is found that SysCtlGetClock() which should return the processor clock rate, gives erroneous output. This is a known bug in CCS. This means that even though the system might work when it run via CCS, once it is reset, the working breaks down. For our case, the Transmission rate went from 100kHz to 236kHz on resetting the pin. Instead of calling this function, this value needs to be hardcoded while operating at 80MHz.
+\item \textbf{Dual Functionalities of GPIO Pins}\\
+  Many gpio pins have dual functionalities. For example the pin PB3 is also used for USBStdio communication, and it was being used for sending the data, and hence the waveform that resulted didn't get stabilised. Before using any gpio pin, it must be carefully checked if that pinhas any other functionality.
+\item \textbf{Multiple Interrupts being called at the same time}\\
+  Extra care must be taken to ensure that multiple interrupts are not called at the same time. If this is required to happen the priority order must be checked first. For testing purposes, both reception and transmission code were run on the same tivaC board, which resulted in occurence of a gpio interrupt due to receiver in between a timer interrupt of the transmittter. 
+\item \textbf{Fault ISR}\\
+  This is perhaps the most common bug in any code. Many a times for no apparent reason the code stops at FaultISR interrupt. This basically happens when the software is stuck in an infinite loop. But most often than not (atleast in our experience) this was not the problem. The culprit was rather the out of array indexing, which basically means we were incorrectly trying to access some an element of an array out of its length. 
 \end{enumerate}
 
 \section{Chapter 5 : Conclusion and suggestions for future work}
