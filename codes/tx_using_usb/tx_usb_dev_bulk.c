@@ -54,6 +54,8 @@ extern void config_timer();
 bool start_timer_bit = 0;
 extern bool *data_to_tx;
 extern void send_sentence(char*,int);
+extern void send_file();
+
 
 uint8_t to_tx_buffer_temp[256];
 int ptr_to_tx_buffer = 0;
@@ -590,8 +592,10 @@ int main(void)
 //            tx_byte(0b10011100);
 //            tx_byte(0x00);
             tx_byte('C');
-//            send_sentence("Hello",5);
-            tx_byte('D');
+//            send_sentence("Hello\n",6);
+            send_file();
+            send_sentence("END",3);
+//            tx_byte('D');
 //            tx_byte('E');
 //            tx_byte('F');
 //            tx_byte('G');

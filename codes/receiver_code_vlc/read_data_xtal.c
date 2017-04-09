@@ -22,7 +22,7 @@ int rx_temp_data_ptr;
 int final_buff[256];
 int final_buff_ptr;
 int first_start;
-int32_t see_bit[2];
+int32_t see_bit[4];
 int see_bit_counter;
 int32_t data_in_ptr;
 int offset;
@@ -63,6 +63,8 @@ void init_zero()
     see_bit_counter = 0;
     see_bit[0] = 0;
     see_bit[1] = 0;
+    see_bit[2] = 0;
+    see_bit[3] = 0;
     see_bit_start = 0;
     rx_counter = 0;
     first_start = 0;
@@ -79,13 +81,14 @@ void gpiob_interrupt_handler()
 //    dat= GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_1);
     dat = GPIOPinRead(GPIO_PORTC_BASE,0xff);
     dat_1 = (dat&0xf0) >> 4;
+
 //
-    if (dat_1 == 3 && see_bit_start == 0)
+    if (dat_1 == 3 && see_bit_start == 0 && sv_st_tmp == 0)
     {
         see_bit[0] = 3;
         see_bit_counter = 0;
-    }
 
+    }
     if(see_bit_counter == 4 && dat_1 == 4 && see_bit[0] == 3 && sv_st_tmp == 0)
     {
         see_bit[1] = 4;
@@ -95,25 +98,42 @@ void gpiob_interrupt_handler()
         first_start = rx_temp_data_ptr;
         sv_st_tmp = 1;
     }
+//    else if(see_bit_counter == 4 && dat_1 == 4 && see_bit[0] == 3 && sv_st_tmp == 0)
+//    {
+//        see_bit[1] = 4;
+//        see_bit_counter++;
+//    }
+//    else if(see_bit_counter == 8 && dat_1 == 4 && see_bit[0] == 3 && see_bit[1] == 4 && sv_st_tmp == 0)
+//    {
+//        see_bit[2] = 4;
+//        see_bit_counter++;
+//    }
+//    if(see_bit_counter == 12 && dat_1 == 4 && see_bit[0] == 3 && see_bit[1] == 4 &&  see_bit[2] == 4 && sv_st_tmp == 0)
+//    {
+//                see_bit[3] = 4;
+//                see_bit_counter = 0;
+//                save_start = 1;
+//                rx_counter = 0;
+//                first_start = rx_temp_data_ptr;
+//                sv_st_tmp = 1;
+//    }
     else
     {
         see_bit_counter++;
         see_bit_start = 0;
     }
     rx_temp_data[rx_temp_data_ptr++] = dat_1;
-//    if(rx_temp_data[rx_temp_data_ptr] == '')
-//    data_in[data_in_ptr] = dat >> 1;
-//    if(save_start == 0 && rx_temp_data[rx_temp_data_ptr-1] == 4 && rx_temp_data[rx_temp_data_ptr-5] == 3 )
-//    {
-//        save_start = 1;
-//        first_start = rx_temp_data_ptr;
-//        rx_counter = 0;
-//    }
+
     if(save_start == 1)
     {
         if(rx_counter != 0 && rx_counter % 4 == 0 && rx_counter%8 == 0)
         {
             final_buff[final_buff_ptr] += (dat &0xf0);
+
+            if(final_buff[final_buff_ptr] == 'D' && final_buff[final_buff_ptr - 1] == 'N' && final_buff[final_buff_ptr-2] == 'E')
+            {
+                GPIOIntDisable(GPIO_PORTB_BASE, GPIO_PIN_0);
+            }
             final_buff_ptr++;
         }
         else if(rx_counter%4  == 0 && rx_counter%8 == 4)

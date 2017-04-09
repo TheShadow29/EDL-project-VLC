@@ -1,0 +1,6 @@
+extern void send_sentence(char*,int);
+send_file()
+{
+send_sentence(Hello World);
+send_sentence(Yo man);
+}

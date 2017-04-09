@@ -45,6 +45,7 @@ int n_bits_tx = 6;
 //int test_cl = 100;
 bool clk = 0;
 void send_data(int);
+
 void tx_byte(uint8_t);
 uint8_t byte_test = 0b11001010;
 

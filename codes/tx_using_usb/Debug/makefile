@@ -9,6 +9,7 @@ GEN_CMDS__FLAG :=
 
 ORDERED_OBJS += \
 "./startup_ccs.obj" \
+"./tx.obj" \
 "./tx_direct_buffer.obj" \
 "./tx_usb_dev_bulk.obj" \
 "./usb_bulk_structs.obj" \
@@ -161,8 +162,8 @@ tx_using_usb.bin: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "startup_ccs.obj" "tx_direct_buffer.obj" "tx_usb_dev_bulk.obj" "usb_bulk_structs.obj" "utils/uartstdio.obj" "utils/ustdlib.obj" 
-	-$(RM) "startup_ccs.d" "tx_direct_buffer.d" "tx_usb_dev_bulk.d" "usb_bulk_structs.d" "utils/uartstdio.d" "utils/ustdlib.d" 
+	-$(RM) "startup_ccs.obj" "tx.obj" "tx_direct_buffer.obj" "tx_usb_dev_bulk.obj" "usb_bulk_structs.obj" "utils/uartstdio.obj" "utils/ustdlib.obj" 
+	-$(RM) "startup_ccs.d" "tx.d" "tx_direct_buffer.d" "tx_usb_dev_bulk.d" "usb_bulk_structs.d" "utils/uartstdio.d" "utils/ustdlib.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 
