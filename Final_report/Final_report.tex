@@ -6,12 +6,14 @@
 \usepackage{pdflscape}
 \usepackage{listings}
 \usepackage{enumitem}
-\usepackage[normalem]{ulem}
+%%\usepackage[normalem]{ulem}
 \usepackage{mathtools}
 \usepackage{hyperref}
 % \usepackage{float}
 % \usepackage{hyperref}
 % \usepackage{titlesec}
+\usepackage{caption}
+\usepackage{subcaption}
 
 %% To do:
 %% > Which led used
@@ -105,7 +107,28 @@ The Transmitter circuit takes the data (to be sent) as the input from the TivaC 
 Our implementation of the circuit uses the IC SN7440N which is a dual quad input NAND gate to drive the signal. There are pull up resistors at the input and similarly pull down resistors at the output to control the amplitude of the driven signal and hence the average intensity of the LED.
 
 This is an essential factor because often in VLC applications the primary application of the light source is not communication but rather is to provide illumination. Thus it is essential that we should not be affecting the primary purpose in order to achieve the dual motive. Another reason that necessitates control of average intensity is the sensitivity of the photodiode. Often the photodiode that is used is sensitive in a range of intensities and tends to underperform or saturate if we use it outside this range Thus depending on the distance between the transmitter and the receiver we might have to tune these values. For the LED driver any simple logic gate can be used with appropriate function. We have employed a NAND gate for the purpose because of its low resistance of the NAND gate when a low logic is driven at the output which ensures that the output is not affected.
+
+\begin{figure}[h]
+\begin{subfigure}[t]{0.5\textwidth}
+	\centering
+	\includegraphics[scale = 0.4]{images/Transmitter.JPG}
+	\caption{Transmitter implementation}
+	\label{Fig :1b}
+\end{subfigure}
+~
+% \begin{subfigure}[t]{0.5\textwidth}
+% 	\centering
+% 	\includegraphics[scale = 0.4]{noisy_30.jpg}
+% 	\caption{Noisy image}
+% 	\label{Fig :1b}
+% \end{subfigure}
+% ~
+
+\end{figure}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PICTURE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 \subsection{The Receiver Circuit}
 The Receiver Circuit, as the name suggests, corresponds to the hardware at the receiving end of the signal that is used to capture the signal and retrieve it. In essence, this circuit captures the data, amplifies the captured signal, filters the noise to retrieve the waveform which can be used for clock synchronisation.
 
@@ -118,6 +141,25 @@ The buffer is made using a standard OPAMP implementation of the same by using a 
 Interestingly, this application does not have a noise in the high frequency range but instead has in the low frequency range. This is primarily because the noise added to the system comes from the ambient light falling on the photodiode. The fluctuations in the intensity have a frequency component equal to that of frequency of the supply equal to 50Hz. Thus it is essential to remove the 50Hz component from the received signal. If this not done, then the waveform looks like a actual one modulated on a very low frequency wave (which actually corresponds to the 50 Hz).  Thus the waveform is passed through a simple RC high pass filter with a cutoff frequency of $700 Hz$.
 
 The waveform at this point has been affected and loses it rectangular shape. To ensure recovery of the original rectangular waveform, the output is passed through a comparator. The comparator used here is LM361 which works very well upto $1 MHz$ which is well above the required range. The output of the comparator is then fed to the clock synchronisation and frequency correction circuit.
+
+
+\begin{figure}[h]
+\begin{subfigure}[t]{0.5\textwidth}
+	\centering
+	\includegraphics[scale = 0.4]{images/Receiver.jpg}
+	\caption{Receiver implementation}
+	\label{Fig :1b}
+\end{subfigure}
+~
+% \begin{subfigure}[t]{0.5\textwidth}
+% 	\centering
+% 	\includegraphics[scale = 0.4]{noisy_30.jpg}
+% 	\caption{Noisy image}
+% 	\label{Fig :1b}
+% \end{subfigure}
+% ~
+
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%PICTURE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -142,11 +184,21 @@ The question which follows immediately is how does the PLL circuit remember the 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55% *PIC* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\begin{figure}[h]
+
+	\centering
+	\includegraphics[scale = 0.4]{images/Diff_all_pulses.JPG}
+	\caption{Differentiator showing pulses on each edge}
+	\label{Fig :1b}
+
+
+\end{figure}
+
 As it can be seen in the picture shown above, if the differentiator captures every high to low transition, a waveform will be obtained which corresponds to the signal B. But the transitions, which corresponds to the actual clock, that is the ones which PLL actually needs to receive at its input are circled in the signal B. So the primary question is how to get rid off the unwanted the unwanted transitions?  
 The answer lies in the special feature of PLL IC CD4046B called the Phase Comparator II
 
 \item \textbf{The Phase Comparator II}\\
-  Phase Comparator II is an edge controlled digital memory network. The comparator acts only on the positive edges of the data signals and comparator input signals. The duty cycle of signal and comparator inputs are, thus, NOT important. If the frequencies and phases of the input and output signal do not match, then the capacitor voltage increases or decreases correspondingly (according to the working of PLL explained above) such that the frequencies and phase become equal. The main point to be noted here is that Phase Comparator II has MEMORY! During the ON intervals, that is when the pulse is present at the input of PLL, it provides the clock output as it should. But during the OFF intervals, that is the scenario where the pulse is NOT present at the desired time instant, the Phase Comparator II remembers the old clock and provides the previous clock output! This fact is utilized to remember the clock during the transition of moving from the synchronization pulse to the beginning of actual data transmission.
+  Phase Comparator II is an edge controlled digital memory network. The comparator acts only on the positive edges of the data signals and comparator input signals. The duty cycle of signal and comparator inputs are, thus, NOT important. If the frequencies and phases of the input and output signal do not match, then the capacitor voltage increases or decreases correspondingly (according to the working of PLL explained above) such that the frequencies and phase become equal. The main point to be noted here is that Phase Comparator II has memory! During the ON intervals, that is when the pulse is present at the input of PLL, it provides the clock output as it should. But during the OFF intervals, that is the scenario where the pulse is NOT present at the desired time instant, the Phase Comparator II remembers the old clock and provides the previous clock output! This fact is utilized to remember the clock during the transition of moving from the synchronization pulse to the beginning of actual data transmission.
 
 With the above knowledge, the working of the entire circuit can now be explained.
 
@@ -167,12 +219,33 @@ The answer as described above is the magic of Phase Comparator II (PC II). When 
   
 \end{enumerate}
 
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale = 0.4]{images/Diff_one_pulse.JPG}
+	\caption{This is the pulse D with the input to the PLL}
+	\label{Fig :1b}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale = 0.4]{images/CD.JPG}
+	\caption{The figure shows the $90^\circ$ phase difference between the C and D pulses}
+	\label{Fig :1b}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale = 0.4]{images/Selected_pulses.JPG}
+	\caption{The figure shows the alternate pulses which have been captured}
+	\label{Fig :1b}
+\end{figure}
+
 \subsection{Shift Register and Receiver Code}
 The receiver circuits outputs the manchester decoded bits and the clock. This is passed through a shift register. We have chosen SN7495 as the shift register. 
 \begin{enumerate}
 \item \textbf{Shift Register}
   The shift register has many modes and for the project serial shift left and parallel load is used, i.e. it bascially takes in a serial input and gives parallel output on 4 pins. It takes the PLL clock and data output as its input and synchronously gives output the current 4 bits of the data.
-\item \textbf{Reciever Code}
+\item \textbf{Receiever Code}
   The receiver has 4 pins from the shift register going into its 4 gpio pins. The clock is also sent to a gpio pin of the TivaC, and a gpio interrupt on this pin is initialized with the interrupt being called at the rising edge. When a rising edge is detected an interrupt function handler is called which then reads the 4 gpio pins to get the data of the shift register. 
   
   The receiver (TivaC) initially checks for a start sequence. When this start sequence is found it knows that anything after this will be valid data. Since the shift register gives 4 pin output, the reciever checks in multiples of 4 and uses those data for making up a whole byte. This is done with respect to the start sequence that is after every $4^{th}$ clock cycle it checks whether or not to read the data or not. Thus at every $(4k+1)$ rising edge it receives the lower nibble and at every $(4k)$ rising receives the higher nibble and combines them to form a byte and increments the array pointer.  
@@ -285,6 +358,12 @@ Since this is the most complex circuit as a whole, step-by-step testing was unav
 \end{enumerate}
 
 \section{Chapter 5 : Conclusion and suggestions for future work}
+
+The project was finally completed, almost reaching the intended aims by the end of the semester. The system is fairly robust to ambient light and and provides speeds upto $300$ kbps with negligible bit error rate. A number of constraints in the system are because of the constraint of the hardware used and hence was not able to completely achieve the intended specifications. This project can be developed in future in the following domains:
+
+1. The performance of the PLL IC currently employed begins to get affected near the range of $300$ kHz whicu puts a constraint on the time period of a transmitted bit and thus on the data rate. This issue can be worked upon by using a better but expensive PLL IC. 
+2 . Another issue that limits the performance is the buffering of tivac. The tivac has a small and limited buffer which puts an upper cap on the amount of data that can be transmitted at once. A device with a larger buffer would help increase the overall effective data rate.Another thing that can be worked upon is a dynamic buffer. The buffer of tivac can either read data or transmit it. It can only do one at a time and cannot do both of them simultaneously. The employment of a device which facilitates this would be a huge boost to the performance of the system in terms of data rates.
+3. The current implementation uses a torch as a light source. Another thing that is possible is to use an actual light source which has a primary purpose of illumination for the purpose of communication. This will be a great step in making this an actual deployable product. 
 
 
 
