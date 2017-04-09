@@ -53,6 +53,7 @@ extern void config_GPIO();
 extern void config_timer();
 bool start_timer_bit = 0;
 extern bool *data_to_tx;
+extern void send_sentence(char*,int);
 
 uint8_t to_tx_buffer_temp[256];
 int ptr_to_tx_buffer = 0;
@@ -581,14 +582,66 @@ int main(void)
             tx_byte(0x00);
             t_j--;
         }
-        t_j = 24;
+//        t_j = 24;
+        t_j = 1;
         while(t_j)
         {
 //            tx_byte(0b11101110)
 //            tx_byte(0b10011100);
 //            tx_byte(0x00);
             tx_byte('C');
-            tx_byte('D');
+            send_sentence("Hello",5);
+//            tx_byte('D');
+//            tx_byte('E');
+//            tx_byte('F');
+//            tx_byte('G');
+//            tx_byte('H');
+//            tx_byte('I');
+//            tx_byte('J');
+//            tx_byte('K');
+//            tx_byte('L');
+//            tx_byte('M');
+//            tx_byte('N');
+//            tx_byte('O');
+//            tx_byte('P');
+//            tx_byte('Q');
+//            tx_byte('R');
+//            tx_byte('S');
+//            tx_byte('T');
+//            tx_byte('U');
+//            tx_byte('V');
+//            tx_byte('W');
+//            tx_byte('X');
+//            tx_byte('Y');
+//            tx_byte('Z');
+//            tx_byte('A');
+//            tx_byte('B');
+//            tx_byte('d');
+//            tx_byte('e');
+//            tx_byte('f');
+//            tx_byte('g');
+//            tx_byte('h');
+//            tx_byte('i');
+//            tx_byte('j');
+//            tx_byte('k');
+//            tx_byte('l');
+//            tx_byte('m');
+//            tx_byte('n');
+//            tx_byte('o');
+//            tx_byte('p');
+//            tx_byte('q');
+//            tx_byte('r');
+//            tx_byte('s');
+//            tx_byte('t');
+//            tx_byte('u');
+//            tx_byte('v');
+//            tx_byte('w');
+//            tx_byte('x');
+//            tx_byte('y');
+//            tx_byte('z');
+//            tx_byte('a');
+//            tx_byte('b');
+
 //            tx_byte(0xD6);
             t_j--;
         }

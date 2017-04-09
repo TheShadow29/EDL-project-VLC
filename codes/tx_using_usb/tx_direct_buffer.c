@@ -104,6 +104,7 @@ void timer0_interrrupt_handler()
     if (tx_back == tx_front)
     {
         tx_back = 4000;
+//        TimerIntDisable(TIMER0_BASE,TIMER_TIMA_TIMEOUT);
     }
 
 
@@ -130,7 +131,7 @@ void send_data(int n)
         {
 //            tx_back = 3998;
             tx_back = 4000;
-//            TimerIntDisable()
+//            TimerIntDisable(TIMER0_BASE,TIMER_TIMA_TIMEOUT);
         }
         else
         {
@@ -201,12 +202,26 @@ void tx_to_synch_buffer(uint8_t byte)
     }
 }
 
-void tx_bits(bool bit)
+void tx_bits(uint8_t byte)
 {
-         GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_3, bit << 3);
-        SysCtlDelay(190);
+//         GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_3, bit << 3);
+//        SysCtlDelay(190);
+    int j = 0;
+    for(j = 0; j < 8; j++)
+    {
+//        uint8_t a = byte;
+        data_to_tx[tx_front++] = (byte >> j)&(0x01);
+    }
 }
 
+void send_sentence(char* sent, int n)
+{
+    int i = 0;
+    for (i = 0; i < n; i++)
+    {
+        tx_byte(sent[i]);
+    }
+}
 
 
 int not_main()
