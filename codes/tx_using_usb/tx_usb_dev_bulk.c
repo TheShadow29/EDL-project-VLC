@@ -590,8 +590,8 @@ int main(void)
 //            tx_byte(0b10011100);
 //            tx_byte(0x00);
             tx_byte('C');
-            send_sentence("Hello",5);
-//            tx_byte('D');
+//            send_sentence("Hello",5);
+            tx_byte('D');
 //            tx_byte('E');
 //            tx_byte('F');
 //            tx_byte('G');

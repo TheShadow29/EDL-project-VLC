@@ -17,7 +17,7 @@
 #include "driverlib/timer.h"
 
 //int32_t data_in[6144];
-int rx_temp_data[1024];
+int rx_temp_data[6144];
 int rx_temp_data_ptr;
 int final_buff[256];
 int final_buff_ptr;
@@ -27,6 +27,8 @@ int see_bit_counter;
 int32_t data_in_ptr;
 int offset;
 int save_start;
+int sv_st_tmp;
+int see_bit_start;
 
 int rx_counter;
 //int rx_counter;
@@ -38,7 +40,7 @@ void init_zero()
 //    {
 //        data_in[k] = 0;
 //    }
-    for(k = 0; k < 1024;k++)
+    for(k = 0; k < 6144;k++)
     {
         rx_temp_data[k] = 0;
     }
@@ -60,9 +62,11 @@ void init_zero()
     }
     see_bit_counter = 0;
     see_bit[0] = 0;
-    see_bit[1] = 1;
+    see_bit[1] = 0;
+    see_bit_start = 0;
     rx_counter = 0;
     first_start = 0;
+    sv_st_tmp = 0;
 }
 
 
@@ -75,31 +79,36 @@ void gpiob_interrupt_handler()
 //    dat= GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_1);
     dat = GPIOPinRead(GPIO_PORTC_BASE,0xff);
     dat_1 = (dat&0xf0) >> 4;
-//    if (dat_1 == 3 && see_bit_counter%4 == 0)
-//    {
-//        see_bit[0] = 3;
-//        see_bit_counter = 0;
-//    }
-//    if(see_bit_counter == 4 && dat_1 == 4)
-//    {
-//        see_bit[1] = 4;
-//        see_bit_counter = 0;
-//        save_start = 1;
-//    }
-//    else
-//    {
-//        see_bit_counter = 0;
-//    }
-    rx_temp_data[rx_temp_data_ptr++] = (dat &0xf0) >> 4;
+//
+    if (dat_1 == 3 && see_bit_start == 0)
+    {
+        see_bit[0] = 3;
+        see_bit_counter = 0;
+    }
 
+    if(see_bit_counter == 4 && dat_1 == 4 && see_bit[0] == 3 && sv_st_tmp == 0)
+    {
+        see_bit[1] = 4;
+        see_bit_counter = 0;
+        save_start = 1;
+        rx_counter = 0;
+        first_start = rx_temp_data_ptr;
+        sv_st_tmp = 1;
+    }
+    else
+    {
+        see_bit_counter++;
+        see_bit_start = 0;
+    }
+    rx_temp_data[rx_temp_data_ptr++] = dat_1;
 //    if(rx_temp_data[rx_temp_data_ptr] == '')
 //    data_in[data_in_ptr] = dat >> 1;
-    if(save_start == 0 && rx_temp_data[rx_temp_data_ptr-1] == 4 && rx_temp_data[rx_temp_data_ptr-5] == 3 )
-    {
-        save_start = 1;
-        first_start = rx_temp_data_ptr;
-        rx_counter = 0;
-    }
+//    if(save_start == 0 && rx_temp_data[rx_temp_data_ptr-1] == 4 && rx_temp_data[rx_temp_data_ptr-5] == 3 )
+//    {
+//        save_start = 1;
+//        first_start = rx_temp_data_ptr;
+//        rx_counter = 0;
+//    }
     if(save_start == 1)
     {
         if(rx_counter != 0 && rx_counter % 4 == 0 && rx_counter%8 == 0)
@@ -155,11 +164,21 @@ void gpiob_interrupt_handler()
 //    {
 //        data_in_ptr = 6143;
 //    }
-    if(rx_temp_data_ptr == 1024)
+//    if(rx_temp_data_ptr == 1024)
+//    {
+//        rx_temp_data_ptr = 0;
+//        rx_counter = 0;
+//    }
+    if(rx_counter == 1024)
     {
-        rx_temp_data_ptr = 0;
         rx_counter = 0;
     }
+    if(rx_temp_data_ptr == 6144)
+    {
+        rx_temp_data_ptr = 0;
+    }
+
+
 }
 
 //void gpioc_interrupt_handler()
