@@ -592,7 +592,7 @@ int main(void)
 //            tx_byte(0b10011100);
 //            tx_byte(0x00);
             tx_byte('C');
-//            send_sentence("Hello\n",6);
+            send_sentence("Hello\n",6);
             send_file();
             send_sentence("END",3);
 //            tx_byte('D');

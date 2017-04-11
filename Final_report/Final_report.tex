@@ -16,7 +16,7 @@
 \usepackage{subcaption}
 
 %% To do:
-%% > Which led used
+% > Which led used
 %% > Manchester Encoding ?
 %% 
 
@@ -24,34 +24,64 @@
 
 
 \begin{document}
-% \maketitle
 
-EE 344 Final Report : Visible Light Communication using LED\\
-Group No. B-05\\
-Faculty Incharge: Prof. Kumar Appaiah\\
-TA Associated : \\
+
+% \title{
+\begin{titlepage}
+   % \vspace*{\stretch{1.0}}
+   \begin{center}
+     \Large\textbf{EE 344 Final Report \\Visible Light Communication using LED}\\
+     \vspace{3cm}
+     \large \textbf{Group No. B-05}\\
+     \large\textit{Arka Sadhu - 140070011\\Sudeep Salgia - 14D070011\\Parth Kothari - 14D070019\\}
+     \vspace{3cm}
+     \large\textbf{Faculty Mentor : Prof. Kumar Appiah}\\
+     \large\textbf{RA associated : Akshay}\\
+     \vspace{5cm}
+     \includegraphics[scale=0.15]{images/iitblogo}
+   \end{center}
+   % \vspace*{\stretch{2.0}}
+\end{titlepage}
+
+% Faculty Incharge: Prof. Kumar Appaiah\\
+% TA Associated : \\
 % Group Members:\\
-Arka Sadhu - 140070011\\
-Sudeep Salgia - 14D070011\\
-Parth Kothari - 14D070019\\
+% \author{
 % \hline
-
+% \maketitle
+\newpage
 \section{Abstract}
-Mark Twain had once remarked, “Buy land -- they’re not making it anymore”. Interestingly, in today’s context this holds even for the spectrum. With the spectrum limited anyway and its increased demand greatly driven by the need of the newer technologies like Internet of Things, there is an urgent need to look for solution of this spectrum-crunch. Surprisingly, the solution is staring right at us - visible light. This has led to whole new fast developing field of light fidelity or popularly known as, LiFi. It is a term often used in place of Visible Light Communication which is a technique that aims at solving the problem of illumination and communication together. It achieves this by switching the light sources at high frequencies, making it indiscernible to the human eye by measurable by a sensitive photodiode.
-In our project, we aim to develop a prototype of Visible Light Based Communication link. The
-project will consist of a transmitter, a LED in this case, which will transmit the message signal
-which will be received by the receiver. The data transmitted would be read from a file.
+With the advent of technological developments in the Mobile web access and rapid increase in demand there has been a shortage of available spectrum. Traditionally communication has been done using radio waves, and due to this shortage there is an increasing need to look for different avenues and means for communication and therefore communication using visible light spectrum is a very promising prospect to address the situation. 
+
+LiFi (Light Fidelity) is the new buzzword in new era of communication. It is often used to describe high speed Visible Light Communication (VLC). VLC dedicates itself to solving the problem of illumination and communication together. The way it is implemented is that the
+light source is switched on and off at a very high speed, such that it is not discernible to the human eye, but a sensitive photodiode can detect it. This solves the problem of illumination and at the same we can encode information in the switching pattern and hence enabling us to transmit data, and recover it using the photodiode receiver. In our project, we aim to develop a prototype of Visible Light Based Communication link. The project consists of a transmitter, a LED in this case, which transmits the message signal which is received by the receiver.
+
 \newpage
 \tableofcontents
 \newpage
 \section{Chapter 1 : Introduction}
 % Give Project objective, Block diagram, Motivation for the work
 \subsection{Project Objective}
-The project aims at developing a prototype to establish a commununication link which uses the visible spectrum for transmission. This is popularly knowns as Visible Light Communication (VLC).  
+The project aims at developing a prototype to establish a commununication link which uses the visible spectrum for transmission. This is popularly known as Visible Light Communication (VLC). In addition, it seeks to balance the inherent trade-off between speed and distance with respect to accuracy. The final aim is to reach data rates of 1Mbps at 50cm with accuracy over 99\%.
 \subsection{Block Diagram}
-
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.25]{images/tx_bd}
+  \caption{Transmitter Block Diagram}
+  \label{fig:1}
+\end{figure}
+\vspace{1cm}
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.18]{images/rx_bd}
+  \caption{Receiver Block Diagram}
+  \label{fig:2}
+\end{figure}
 \subsection{Motivation for the Work}
-The previous decade has seen a tremendous technological growth in the field of mobile services, Wifi and applications in the field of Internet of Things. 
+Mark Twain had once remarked, “Buy land -- they’re not making it anymore”. Interestingly, in today’s context this holds even for the spectrum. With the spectrum limited anyway and its increased demand greatly driven by the need of the newer technologies like Internet of Things, there is an urgent need to look for solution of this spectrum-crunch. 
+Surprisingly, the one plausible solution is staring right at us - visible light! This idea has led to a whole new fast developing field of light fidelity or popularly known as, LiFi. It is a term often used in place of Visible Light Communication which is a technique that aims at solving the problem of illumination and communication together. It achieves this by switching the light sources at high frequencies, making it indiscernible to the human eye by measurable by a sensitive photodiode. The applications of such a communication systems are numerous. Imagine the headlights of a driverless car communicating with the traffic lights in order to determine whether to move forward or not. Or take the case of indoor positioning position system, where the camera of the mobile can be used to communicate with the surrounding lights in order to determine our position in, say a large shopping.    
+Thrilled by these varied applications, we decided to develop a prototype of Visible Light Based Communication link. The aim of this project is to send the data as fast as possible while maintaining a desired accuracy of reception. The project consists of a transmitter, a LED in this case, which will transmit the message signal which will be received by the receiver. The data transmitted would be read from a file.
+
 \section{Chapter 2 : Project Design}
 % Give details of the system design, choice of sub systems and other design
 % steps/strateg
@@ -111,11 +141,10 @@ This is an essential factor because often in VLC applications the primary applic
 \begin{figure}[h]
 \begin{subfigure}[t]{0.5\textwidth}
 	\centering
-	\includegraphics[scale = 0.4]{images/Transmitter.JPG}
+	\includegraphics[scale = 0.1]{images/Transmitter.JPG}
 	\caption{Transmitter implementation}
 	\label{Fig :1b}
 \end{subfigure}
-~
 % \begin{subfigure}[t]{0.5\textwidth}
 % 	\centering
 % 	\includegraphics[scale = 0.4]{noisy_30.jpg}
@@ -146,7 +175,7 @@ The waveform at this point has been affected and loses it rectangular shape. To 
 \begin{figure}[h]
 \begin{subfigure}[t]{0.5\textwidth}
 	\centering
-	\includegraphics[scale = 0.4]{images/Receiver.jpg}
+	\includegraphics[scale = 0.1]{images/Receiver.jpg}
 	\caption{Receiver implementation}
 	\label{Fig :1b}
 \end{subfigure}
@@ -175,7 +204,10 @@ The above circuit consists of 3 sub-circuits :
 It is useful to discuss the working of the PLL circuit as it will help explain the working of the entire clock recovery and data decoding circuit.
 
 \begin{enumerate}[label=(\Alph*)]
-\item The Working of PLL
+\item \textbf{The Working of PLL}\\
+  The generic working of the PLL is explained in this section. The working specific to the Visible light communication application is explained in the next section. The PLL takes as input a signal, say Vi, with an input frequency fi which is then passed through a phase detector. A phase detector, basically a comparator, compares the input frequency fi with the feedback frequency fo coming out of a device called VCO (voltage controlled oscillator).The phase detector provides an output error voltage Ver (=fi+fo) and an approximately DC voltage (=fi-fo). This combination of signals is then passed on to an LPF. The LPF removes the high frequency noise and produces a steady DC level, Vf (=Fi-Fo). 
+The DC level is then passed on to a VCO. The output frequency of the VCO (fo) is directly proportional to the input signal. Thus, more the difference in the frequencies, more the changes in comparator frequency brought about by the VCO. Both the input frequency and output frequency are compared and adjusted through feedback loops until the output frequency equals the input frequency. The frequency comparison stops as soon as the output frequency is adjusted to become equal to the input frequency. This stage is called the phase locked state. This property of PLL, of generating a frequency signal, referred to as the “clock”, equal to the frequency of data transmission will be used to sample the data and thus decode it correctly.
+
 %%%%%%%%%%%%%%%%%%%%%TO BE Completed%%%%%%%%%%%%%%%%%%%
 \item \textbf{The PLL Clock Synchronisation Step}\\
   It is necessary for the PLL to determine the rate at which the data is going to be sent to it in order to generate a clock to sample the data (as explained above). Hence, a sequences of 1’s and 0’s need to be sent to the PLL, before the actual data is sent, so that it can determine the clock at which data is being transmitted. This step is called the “Synchronisation Step”. 
@@ -187,7 +219,7 @@ The question which follows immediately is how does the PLL circuit remember the 
 \begin{figure}[h]
 
 	\centering
-	\includegraphics[scale = 0.4]{images/Diff_all_pulses.JPG}
+	\includegraphics[scale = 0.1]{images/Diff_all_pulses.JPG}
 	\caption{Differentiator showing pulses on each edge}
 	\label{Fig :1b}
 
@@ -208,11 +240,20 @@ With the above knowledge, the working of the entire circuit can now be explained
   As described in the phase comparator II section, the phase comparator II of the PLL responds only to the positive edges of the data input signal (or the comparator input signal). Thus, the differentiator is used in order to get pulses corresponding to the rising and the falling edges of the data. The reason for considering both the rising and falling edge transitions is that in the manchester encoded “0”, that is, half cycle low and half cycle high bit, the low to high transition corresponds to the actual clock signal to be extracted ( for example, the first and the third peak in signal B of the diagram) while in the manchester encoded “1”, that is, first half cycle high and next half cycle low bit, the high to low transition corresponds to the actual clock signal to be extracted ( for example, the fourth and the sixth peak in signal B of the diagram). Hence, differentiator is used to give pulses at both the edges.
 
 \item \textbf{The PLL Circuit}\\
+    \begin{figure}[h]
+    % \centering
+    \includegraphics[scale=0.45]{images/PLL}
+    \caption{PLL}
+    \label{fig:PLL}
+  \end{figure}
+
   The PLL Circuit consists of the IC 4046B, FF1 and FF2 as shown in the above diagram. The data signal input of PLL circuit is the output of the AND gate. Assuming that the input signal correspond to the pulses of the actual clock underlying of the data (reason to the provided later), the output of the VCO is a clock at twice the data frequency. The reason is that the VCO output is passed through the FF1 which divides the frequency of VCO output by 2. The output of FF1, which corresponds to signal C in the above diagram, is fed to the comparator input signal of PLL. Since locking takes place between the data input signal and comparator input signal, thus, the frequency of the comparator input should be same as that of data. And thus, the frequency of VCO output turns out to be twice the frequency of data because of the voltage divider present in between.
 
   The idea behind keeping a frequency divider after the VCO output revolves around the fact that the PLL circuit needs another signal, whose clock is 90 degrees phase shifted with the actual clock in order to select only those output pulses of the differentiator which correspond to the actual clock. See the signals B, C and D in the above figure together. B contains pulses at all those instants where a transition has taken place in the data signal. C has the same phase and frequency as the input signal. D is 90 degree shifted version of C. The question which remains to be answered is how does C correspond to the actual clock frequency and phase even after actual data has started transmitting?
   
 The answer as described above is the magic of Phase Comparator II (PC II). When the transition took place from synchronising data to actual data, the PC II, remembered the old clock and continued to give the output C. Later, D being 90 degrees out of phase with C (precisely speaking, leading C), was “AND”ed with the output of the differentiator. Because of this, as shown in the above figure, only the pulses correspond to the actual clock survive! And thus, the PLL circuit still retains the actual clock frequency.    
+
+
 
 \item \textbf{The Decoder Circuit}
   The decoder circuit decodes the manchester encoded signal on hardware itself. It consists of a single flip flop (FF3 in the figure) whose data input is the actual signal and clock input as signal D. As seen in the figure, the output of FF3 is signal E, which when sampled at the falling edges of signal D gives the desired manchester decoded data. 
@@ -221,21 +262,21 @@ The answer as described above is the magic of Phase Comparator II (PC II). When 
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[scale = 0.4]{images/Diff_one_pulse.JPG}
+	\includegraphics[scale = 0.1]{images/Diff_one_pulse.JPG}
 	\caption{This is the pulse D with the input to the PLL}
 	\label{Fig :1b}
 \end{figure}
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[scale = 0.4]{images/CD.JPG}
+	\includegraphics[scale = 0.1]{images/CD.JPG}
 	\caption{The figure shows the $90^\circ$ phase difference between the C and D pulses}
 	\label{Fig :1b}
 \end{figure}
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[scale = 0.4]{images/Selected_pulses.JPG}
+	\includegraphics[scale = 0.1]{images/Selected_pulses.JPG}
 	\caption{The figure shows the alternate pulses which have been captured}
 	\label{Fig :1b}
 \end{figure}
@@ -255,6 +296,11 @@ The receiver circuits outputs the manchester decoded bits and the clock. This is
   Once everything is received it sends the received data to the PC using USB link.
 \end{enumerate}
 
+\subsection{Power Supply}
+To make this system portable another component has to be designed in addition to the above which is the power supply, one each for the transmitter and the receiver. As per feasibility, a $12 V$ source can be generated using the mains or a $12 V$ battery. Using two such sources a dual power source of $\pm 12 V$ is generated with reference to a common ground which is common across the entire transmitter and the receiver individually. The system also employs the usage of a $\pm 5V$ for all the ICs which is generated independently on either side using a $7805$ IC which converts the $12 V$ to $5 V$. Since all the components are mainly small ICs which have low power requirements, the net current requirement is small and hence can be easily supported by such a system and additional protection needed not be designed or added.
+
+
+
 
 
 \section{Chapter 4 : Performance Evaluation}
@@ -264,8 +310,20 @@ The receiver circuits outputs the manchester decoded bits and the clock. This is
 The following the specifications of the prototype. It has a detailed explanation of each of the components and the reasons for choosing the same.
 
 \subsubsection{The transmitter circuit}
-It is a simple circuit which uses a NAND gate of the SN7440N IC. It is a dual quad-input IC. The input is connected to the power supply by a pull up resistor of $1.5k \Omega$ while the output pin is connected to the positive terminal of the LED by a $220 \Omega $ resistor. A NAND gate was used to drive the circuit primarily for the fact that it has a very low resistance when the output is driven to a low which enables it to easily sink in current and hence not distort the output. 
+It is a simple circuit which uses a NAND gate of the SN7440N IC. It is a dual quad-input IC. The input is connected to the power supply by a pull up resistor of $1.5k \Omega$ while the output pin is connected to the positive terminal of the LED by a $220 \Omega $ resistor. A NAND gate was used to drive the circuit primarily for the fact that it has a very low resistance when the output is driven to a low which enables it to easily sink in current and hence not distort the output.
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{images/transmitter_sch}
+  \caption{Transmitter Circut PCB}
+  \label{fig:tx_circuit}
+\end{figure}
 \subsubsection{The receiver circuit}
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{images/receiver_sch}
+  \caption{Receiver Circuit PCB}
+  \label{fig:rx_circuit}
+\end{figure}
 The first part of the consists of the photodiode which converts the light falling onto into electrical signals, The requirements of the photodiode was a quick response time, a spectral sensitivity in the visible spectrum and a large radiant sensitive area. The size of the
 radiant sensitive area is crucial and therefore the photodiode used was a VISHAY BPW34. The spectral bandwidth is from 430 nm to 1100 nm and gives a perfect range for the intended application. It has a linear light intensity to current ratio and the radiant sensitive area is $7.5 \text{mm}^2$ , which was larger than most photodiodes found. It has a rise
 and fall time of 100 ns each, which provides a switching frequency of $5 MHz$. This was enough since it is above the capabilities of the rest of the hardware and software.
@@ -276,7 +334,24 @@ The output is then passed through a high pass filter made by using simple passiv
 
 The next element was a comparator. Here an OPAMP based comparator was not sufficient because it does not perform well in the high frequency range and hence a special comparator IC was used. The specifications of the comparator should have been to reach upto $ 750 kHz $ without distortion. LM 361 has a maximum delay of $20 ns$ and hence more than meets the specifications and is ideal for the purpose.
 
+\subsubsection{Differentiator Circuit}
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{images/Diff_sch}
+  \caption{Differentiator PCB}
+  \label{fig:Differentitor_circuit}
+\end{figure}
+The differentiator circuit, which is used for providing pulses at the edges of the input signal is implemented by basic logic gates - AND, OR and NOT and a delay circuit using a resistor and capacitor. To get pulses at positive edge of a signal $S_o$, it is first passed through a NOT gate to give a signal $\bar{S_o}$. The signal $\bar{S_o}$ is later passed through a delay circuit to give a delayed signal $S_1$. The AND of $S_1$ and $S_0$ gives the required pulse at the positive edge of the signal $S_0$. To get a pulse at the negative edge of $S_0$, a NOT of $S_0$ is taken initially and the exact same procedure as above is followed. Finally, ORing the pulses obtained gives the desired signal which corresponds to pulses outputted at the transitions of the input signal $S_0$.    
+
 \subsubsection{PLL Circuit}
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.5]{images/PLL_sch}
+  \caption{PLL pcb}
+\end{figure}
+
+The PLL circuit has already been discussed in great detail above in order to understand the working of the Data Synchronisation and Decoding circuit. The circuit consists of the IC CD4046B, which is essentially a PLL IC consisting of a two Phase Comparators, a tunable Low Pass Filter and a VCO circuit. Phase Comparator II has been used in the implementation of the project because of reasons mentioned in the earlier section. The Low Pass filter circuit can be tuned with the help of $R_3$ and $C_2$ as shown in figure *. Similarly, the lock range of the PLL can be determined with the help of $R_1$, $R_2$ and $C_1$ using the graph given in figure *. Potentiometer are used instead of $R_1$, $R_2$ which give an additional flexibility of altering the lock range. SN 7474 ICs have been used in order to implement the flip flops, namely $FF_1$, $FF_2$ and $FF_3$. NOT gates and AND gates shown in the figure * are implemented using the standard ICs 7404 and 7408 respectively. 
+
 
 \subsection{Test Results}
 The following tests were conducted to verify the individual components of the complete circuit.
@@ -297,9 +372,16 @@ Since this is the most complex circuit as a whole, step-by-step testing was unav
 \begin{enumerate}[label=(\alph*)]
 \item \textbf{Testing of the Differentiator}\\ A square wave was given at the input of the Differentiator circuit, and verification of the working was done by observing whether pulses were seen at the transitions of the square wave 
 \item \textbf{Testing of the VCO}\\ According to the figure shown below, appropriate values of R1,R2 and C1 need to be chosen in order to determine the lock/capture range of the PLL. To test that the lock/capture range was set as desired, the input of VCO, pin 9 of PLL was grounded in order to get the minimum frequency and later set High in order to get the maximum frequency and thus, the entire lock/frequency range.
+    \begin{figure}[h]
+    % \centering
+    \includegraphics[scale=0.45]{images/FreqDeterm}
+    \caption{Lock Range Determining Graphs}
+    \label{fig:PLL}
+  \end{figure}
 \item \textbf{Testing of the PLL on Square Inputs}\\ In order to test only the PLL circuit, without the flip flops, a signal of frequency within the lock/capture range, was given at the input of PLL, the VCO output was shorted with the Comparator signal input to see whether the PLL locked on simple signals.
 \item \textbf{Testing the PLL Circuit with Flip Flops}\\ The Entire PLL circuit, without the Differentiator and Decoder was tested next. Instead the output of AND Gate, again a square signal was given to the input pin 14 of PLL. Verification was done whether signal C and signal D were obtained as desired according to figure *
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PICTURE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \item \textbf{Testing the PLL Circuit along with Differentiator and  Encoder} \\ Finally, entire circuit connected in order to form a closed loop. A square pulse followed by a psuedo random sequence was given at the input of the differentiator and signals corresponding to B, C, D were observed. Expected desired observations confirmed the working of the clock synchronisation and Data recovery circuit.
 \end{enumerate}
 
@@ -360,12 +442,19 @@ Since this is the most complex circuit as a whole, step-by-step testing was unav
 \section{Chapter 5 : Conclusion and suggestions for future work}
 
 The project was finally completed, almost reaching the intended aims by the end of the semester. The system is fairly robust to ambient light and and provides speeds upto $300$ kbps with negligible bit error rate. A number of constraints in the system are because of the constraint of the hardware used and hence was not able to completely achieve the intended specifications. This project can be developed in future in the following domains:
+\begin{enumerate}
+\item The performance of the PLL IC currently employed begins to get affected near the range of $300$ kHz whicu puts a constraint on the time period of a transmitted bit and thus on the data rate. This issue can be worked upon by using a better but expensive PLL IC.
+\item Another issue that limits the performance is the buffering of tivac. The tivac has a small and limited buffer which puts an upper cap on the amount of data that can be transmitted at once. A device with a larger buffer would help increase the overall effective data rate.Another thing that can be worked upon is a dynamic buffer. The buffer of tivac can either read data or transmit it. It can only do one at a time and cannot do both of them simultaneously. The employment of a device which facilitates this would be a huge boost to the performance of the system in terms of data rates.
+\item The current implementation uses a torch as a light source. Another thing that is possible is to use an actual light source which has a primary purpose of illumination for the purpose of communication. This will be a great step in making this an actual deployable product. 
+\end{enumerate}
 
-1. The performance of the PLL IC currently employed begins to get affected near the range of $300$ kHz whicu puts a constraint on the time period of a transmitted bit and thus on the data rate. This issue can be worked upon by using a better but expensive PLL IC. 
-2 . Another issue that limits the performance is the buffering of tivac. The tivac has a small and limited buffer which puts an upper cap on the amount of data that can be transmitted at once. A device with a larger buffer would help increase the overall effective data rate.Another thing that can be worked upon is a dynamic buffer. The buffer of tivac can either read data or transmit it. It can only do one at a time and cannot do both of them simultaneously. The employment of a device which facilitates this would be a huge boost to the performance of the system in terms of data rates.
-3. The current implementation uses a torch as a light source. Another thing that is possible is to use an actual light source which has a primary purpose of illumination for the purpose of communication. This will be a great step in making this an actual deployable product. 
-
-
+\section{Chapter 6 : References}
+\begin{enumerate}
+\item Visible Light Communication by \textit{Shlomi Arnon}
+\item TivaWareTM Peripheral Driver Library User's Guide by \textit{Texas Instruments}
+\item Getting Started with the Tiva TM4C123G LaunchPad Workshop by \textit{Texas Instruments}
+\item CD4046B Phase-Locked Loop: A Versatile Building Block for Micropower Digital and Analog Applications \textit{Texas Instruments}
+\end{enumerate}
 
 \end{document}
 
