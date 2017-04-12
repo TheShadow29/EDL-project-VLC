@@ -24,15 +24,16 @@ int final_buff_ptr;
 int first_start;
 int32_t see_bit[4];
 int see_bit_counter;
+int see_bit_counter2;
 int32_t data_in_ptr;
 int offset;
 int save_start;
 int sv_st_tmp;
 int see_bit_start;
-int st_byt[2];
 
 int rx_counter;
 int urt_send_counter;
+uint8_t st_byt[4];
 //int rx_counter;
 
 void init_zero()
@@ -67,9 +68,12 @@ void init_zero()
     see_bit[1] = 0;
     see_bit[2] = 0;
     see_bit[3] = 0;
+    see_bit_start = 0;
+    see_bit_counter2 = 0;
     st_byt[0] = 3;
     st_byt[1] = 4;
-    see_bit_start = 0;
+    st_byt[2] = 5;
+    st_byt[3] = 4;
     rx_counter = 0;
     first_start = 0;
     sv_st_tmp = 0;
@@ -107,38 +111,80 @@ void gpiob_interrupt_handler()
 //    dat= GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_1);
     dat = GPIOPinRead(GPIO_PORTC_BASE,0xff);
     dat_1 = (dat&0xf0) >> 4;
-//    dat_1 = !dat_1;
-    dat_1 = 0x0f - dat_1;
-
+//    if(sv_st_tmp == 0)
+//    {
+//        see_bit[see_bit_counter++] = dat_1;
+//        if(see_bit[see_bit_counter- 1] == st_byt[3] && see_bit[see_bit_counter -2] == st_byt[2] &&
+//                see_bit[see_bit_counter-3] == st_byt[1] && see_bit[see_bit_counter-4] == st_byt[0])
+//        {
 //
-    if (dat_1 == st_byt[0] && see_bit_start == 0 && sv_st_tmp == 0)
+//        }
+//        else if (see_bit[see_bit_counter- 1] == st_byt[0] && see_bit[see_bit_counter -2] == st_byt[3] &&
+//                see_bit[see_bit_counter-3] == st_byt[2] && see_bit[see_bit_counter-4] == st_byt[1])
+//        {
+//
+//        }
+//        else if (see_bit[see_bit_counter- 1] == st_byt[1] && see_bit[see_bit_counter -2] == st_byt[0] &&
+//                see_bit[see_bit_counter-3] == st_byt[3] && see_bit[see_bit_counter-4] == st_byt[2])
+//        {
+//
+//        }
+//        else if (see_bit[see_bit_counter- 1] == st_byt[2] && see_bit[see_bit_counter -2] == st_byt[1] &&
+//                see_bit[see_bit_counter-3] == st_byt[0] && see_bit[see_bit_counter-4] == st_byt[3])
+//        {
+//
+//        }
+//        else
+//        {
+//            see_bit[0] = 0;
+//            see_bit[1] = 0;
+//            see_bit[2] = 0;
+//            see_bit[3] = 0;
+//            see_bit_counter = 0;
+//        }
+//    }
+//
+    if(sv_st_tmp == 0)
     {
-        see_bit[0] = st_byt[0];
-        see_bit_counter = 0;
+        if (dat_1 == st_byt[0] && see_bit_start == 0)
+        {
+            see_bit[0] = st_byt[0];
+            see_bit_counter = 0;
 
+        }
+        if(see_bit_counter == 4 && dat_1 == st_byt[1] && see_bit[0] == st_byt[0])
+        {
+            see_bit[1] = st_byt[1];
+            see_bit_counter++;
+            see_bit_counter2 = 0;
+                    save_start = 1;
+            rx_counter = 0;
+            //        first_start = rx_temp_data_ptr;
+            sv_st_tmp = 1;
+        }
+        else
+        {
+            see_bit_counter++;
+            see_bit_start = 0;
+        }
     }
-    if(see_bit_counter == 4 && dat_1 == st_byt[1] && see_bit[0] == st_byt[0] && sv_st_tmp == 0)
-    {
-        see_bit[1] = st_byt[1];
-        see_bit_counter = 0;
-        save_start = 1;
-        rx_counter = 0;
-//        first_start = rx_temp_data_ptr;
-        sv_st_tmp = 1;
-    }
-    else
-    {
-        see_bit_counter++;
-        see_bit_start = 0;
-    }
+//    else
+//    {
+//        if(dat_1 == st_byt[2])
+//    }
+//    if(see_bit_counter2 == 4 && dat_1 == st_byt[2] && see_bit[1] = st_byt[1] && see_bit[0] = st_byt[0] && sv_st_tmp == 1)
+//    {
+//        see_bit[2] = st_byt[2];
+//        see_bit_counter2++;
+//    }
+//    if(see_bit_counter2 == )
 //    rx_temp_data[rx_temp_data_ptr++] = dat_1;
 
     if(save_start == 1)
     {
         if(rx_counter != 0 && rx_counter % 4 == 0 && rx_counter%8 == 0)
         {
-
-            final_buff[final_buff_ptr] += ((0xff - dat) &0xf0);
+            final_buff[final_buff_ptr] += (dat &0xf0);
 
             if(final_buff[final_buff_ptr] == 'D' && final_buff[final_buff_ptr - 1] == 'N' && final_buff[final_buff_ptr-2] == 'E')
             {
@@ -149,8 +195,7 @@ void gpiob_interrupt_handler()
         }
         else if(rx_counter%4  == 0 && rx_counter%8 == 4)
         {
-//            final_buff[final_buff_ptr] += (dat&0xf0) >> 4;
-            final_buff[final_buff_ptr] += dat_1;
+            final_buff[final_buff_ptr] += (dat&0xf0) >> 4;
 
         }
         rx_counter++;
