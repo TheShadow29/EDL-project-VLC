@@ -17,9 +17,9 @@
 #include "driverlib/timer.h"
 
 //int32_t data_in[6144];
-int rx_temp_data[6144];
-int rx_temp_data_ptr;
-int final_buff[256];
+//int rx_temp_data[6144];
+//int rx_temp_data_ptr;
+uint8_t final_buff[1500];
 int final_buff_ptr;
 int first_start;
 int32_t see_bit[4];
@@ -31,6 +31,7 @@ int sv_st_tmp;
 int see_bit_start;
 
 int rx_counter;
+int urt_send_counter;
 //int rx_counter;
 
 void init_zero()
@@ -40,26 +41,26 @@ void init_zero()
 //    {
 //        data_in[k] = 0;
 //    }
-    for(k = 0; k < 6144;k++)
-    {
-        rx_temp_data[k] = 0;
-    }
+//    for(k = 0; k < 6144;k++)
+//    {
+//        rx_temp_data[k] = 0;
+//    }
     for(k = 0; k < 256; k++)
     {
         final_buff[k] = 0;
     }
 
     data_in_ptr = 0;
-    rx_temp_data_ptr = 0;
+//    rx_temp_data_ptr = 0;
     save_start = 0;
     final_buff_ptr = 0;
     offset = 0;
-    int j1 =0;
-    for(j1 = 0; j1 < 8; j1++)
-    {
+//    int j1 =0;
+//    for(j1 = 0; j1 < 8; j1++)
+//    {
 //        data_in[data_in_ptr++] = 1;
-        rx_temp_data[rx_temp_data_ptr++] = 0;
-    }
+//        rx_temp_data[rx_temp_data_ptr++] = 0;
+//    }
     see_bit_counter = 0;
     see_bit[0] = 0;
     see_bit[1] = 0;
@@ -69,8 +70,30 @@ void init_zero()
     rx_counter = 0;
     first_start = 0;
     sv_st_tmp = 0;
+    urt_send_counter = 0;
 }
 
+void uart_rx()
+{
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+
+    GPIOPinConfigure(GPIO_PA0_U0RX);
+    GPIOPinConfigure(GPIO_PA1_U0TX);
+
+    GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
+    UARTConfigSetExpClk(UART0_BASE, SysCtlClockGet() , 115200,
+                            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
+    IntEnable(INT_UART0);
+    UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_TX);
+    int j = 0;
+    for(j = 0; j < final_buff_ptr-2;j++)
+    {
+        UARTCharPut(UART0_BASE, final_buff[j]);
+    }
+
+}
 
 void gpiob_interrupt_handler()
 {
@@ -95,34 +118,15 @@ void gpiob_interrupt_handler()
         see_bit_counter = 0;
         save_start = 1;
         rx_counter = 0;
-        first_start = rx_temp_data_ptr;
+//        first_start = rx_temp_data_ptr;
         sv_st_tmp = 1;
     }
-//    else if(see_bit_counter == 4 && dat_1 == 4 && see_bit[0] == 3 && sv_st_tmp == 0)
-//    {
-//        see_bit[1] = 4;
-//        see_bit_counter++;
-//    }
-//    else if(see_bit_counter == 8 && dat_1 == 4 && see_bit[0] == 3 && see_bit[1] == 4 && sv_st_tmp == 0)
-//    {
-//        see_bit[2] = 4;
-//        see_bit_counter++;
-//    }
-//    if(see_bit_counter == 12 && dat_1 == 4 && see_bit[0] == 3 && see_bit[1] == 4 &&  see_bit[2] == 4 && sv_st_tmp == 0)
-//    {
-//                see_bit[3] = 4;
-//                see_bit_counter = 0;
-//                save_start = 1;
-//                rx_counter = 0;
-//                first_start = rx_temp_data_ptr;
-//                sv_st_tmp = 1;
-//    }
     else
     {
         see_bit_counter++;
         see_bit_start = 0;
     }
-    rx_temp_data[rx_temp_data_ptr++] = dat_1;
+//    rx_temp_data[rx_temp_data_ptr++] = dat_1;
 
     if(save_start == 1)
     {
@@ -133,6 +137,7 @@ void gpiob_interrupt_handler()
             if(final_buff[final_buff_ptr] == 'D' && final_buff[final_buff_ptr - 1] == 'N' && final_buff[final_buff_ptr-2] == 'E')
             {
                 GPIOIntDisable(GPIO_PORTB_BASE, GPIO_PIN_0);
+                uart_rx();
             }
             final_buff_ptr++;
         }
@@ -193,10 +198,10 @@ void gpiob_interrupt_handler()
     {
         rx_counter = 0;
     }
-    if(rx_temp_data_ptr == 6144)
-    {
-        rx_temp_data_ptr = 0;
-    }
+//    if(rx_temp_data_ptr == 6144)
+//    {
+//        rx_temp_data_ptr = 0;
+//    }
 
 
 }

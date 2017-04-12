@@ -4,163 +4,257 @@
  *  Created on: 06-Mar-2017
  *      Author: arktheshadow
  */
-//#include <stdint.h>
-//#include <stdbool.h>
-//#include "inc/hw_types.h"
-//#include "inc/hw_memmap.h"
-//#include "driverlib/gpio.h"
-//#include "driverlib/uart.h"
-//#include "driverlib/pin_map.h"
-//#include "driverlib/sysctl.h"
-//#include "inc/hw_ints.h"
-//#include "driverlib/interrupt.h"
-//#include "driverlib/timer.h"
-#include <stdbool.h>
 #include <stdint.h>
-#include "inc/hw_ints.h"
-#include "inc/hw_memmap.h"
+#include <stdbool.h>
 #include "inc/hw_types.h"
-#include "driverlib/debug.h"
-#include "driverlib/fpu.h"
+#include "inc/hw_memmap.h"
 #include "driverlib/gpio.h"
-#include "driverlib/interrupt.h"
+#include "driverlib/uart.h"
 #include "driverlib/pin_map.h"
 #include "driverlib/sysctl.h"
-#include "driverlib/systick.h"
+#include "inc/hw_ints.h"
+#include "driverlib/interrupt.h"
 #include "driverlib/timer.h"
-#include "driverlib/uart.h"
 #include "driverlib/rom.h"
 #include "usblib/usblib.h"
 #include "usblib/usb-ids.h"
 #include "usblib/device/usbdevice.h"
 #include "usblib/device/usbdbulk.h"
-#include "utils/uartstdio.h"
-#include "utils/ustdlib.h"
 #include "usb_bulk_structs.h"
 
-//extern uint32_t
 
-
-int32_t data_in[2048];
-int32_t see_bit[2];
+//int32_t data_in[6144];
+int rx_temp_data[6144];
+int rx_temp_data_ptr;
+int final_buff[256];
+int final_buff_ptr;
+int first_start;
+int32_t see_bit[4];
+int see_bit_counter;
 int32_t data_in_ptr;
-int32_t rx_back = 0;
+int offset;
+int save_start;
+int sv_st_tmp;
+int see_bit_start;
 
-int falling_edges_count = 0;
+int rx_counter;
+int f_read_index;
+int start_send_to_pc;
+//int rx_counter;
+
+extern uint32_t g_ui32RxCount;
+extern uint8_t g_pui8USBTxBuffer[];
+//extern int usb_main();
 
 void send_to_pc()
 {
-    data_in_ptr = 0;
-    data_in[data_in_ptr++] = 0;
-    data_in[data_in_ptr++] = 0;
-    data_in[data_in_ptr++] = 0;
-    data_in[data_in_ptr++] = 0;
-    data_in[data_in_ptr++] = 1;
-    data_in[data_in_ptr++] = 1;
-    data_in[data_in_ptr++] = 0;
-    data_in[data_in_ptr++] = 0;
 
-    uint32_t ui32Loop, ui32Space, ui32Count;
-//    uint32_t ui32ReadIndex;
-    uint32_t ui32WriteIndex;
-    tUSBRingBufObject sTxRing;
-    uint32_t ui32NumBytes = data_in_ptr - rx_back;
-    ui32NumBytes = 10;
-    USBBufferInfoGet(&g_sTxBuffer, &sTxRing);
-    ui32Space = USBBufferSpaceAvailable(&g_sTxBuffer);
-    ui32Loop = (ui32Space < ui32NumBytes) ? ui32Space : ui32NumBytes;
-    ui32Count = ui32Loop;
-//    g_ui32RxCount += ui32NumBytes;
-
-//    ui32ReadIndex = (uint32_t)(pui8Data - g_pui8USBRxBuffer);
-    ui32WriteIndex = sTxRing.ui32WriteIndex;
-
-//    while(1)
-////    {
-    int i = 0;
-    int a = 0;
-//    int b = 1;
-    for(i = 0; i < 8;i++)
+    if(start_send_to_pc == 1)
     {
-        a = a +(1<<i)* data_in[rx_back++];
+        if(f_read_index >= final_buff_ptr-1)
+        {
+            f_read_index = 0;
+        }
+        uint32_t ui32Loop, ui32Space, ui32Count;
+        uint32_t ui32WriteIndex;
+        uint32_t ui32NumBytes = final_buff_ptr;
+        tUSBRingBufObject sTxRing;
+
+        USBBufferInfoGet(&g_sTxBuffer, &sTxRing);
+        ui32Space = USBBufferSpaceAvailable(&g_sTxBuffer);
+
+        ui32Loop = (ui32Space < ui32NumBytes) ? ui32Space : ui32NumBytes;
+        ui32Count = ui32Loop;
+
+        g_ui32RxCount += ui32NumBytes;
+
+        ui32WriteIndex = sTxRing.ui32WriteIndex;
+
+        while(ui32Loop)
+        {
+            g_pui8USBTxBuffer[ui32WriteIndex] = final_buff[f_read_index++];
+            ui32WriteIndex++;
+            ui32WriteIndex = (ui32WriteIndex == BULK_BUFFER_SIZE) ?
+                    0 : ui32WriteIndex;
+
+            ui32Loop--;
+        }
+        USBBufferDataWritten(&g_sTxBuffer, ui32Count);
+        SysCtlDelay(100);
     }
-    g_pui8USBTxBuffer[ui32WriteIndex] = a;
-    USBBufferDataWritten(&g_sTxBuffer,1);
-//        while(ui32Loop)
-//            {
-//                int x1 = 0;
-//                for(i)
-//                g_pui8USBTxBuffer[ui32WriteIndex] = data_in[rx_back++];
-//                ui32Loop--;
-//            }
-//            USBBufferDataWritten(&g_sTxBuffer, ui32Count);
-//            if(rx_back == counter)
-//            {
-////                break;
-//                return;
-//            }
-//            else
-//            {
-//                ui32NumBytes = counter - rx_back;
-//                ui32Space = USBBufferSpaceAvailable(&g_sTxBuffer);
-//                ui32Loop = (ui32Space < ui32NumBytes) ? ui32Space : ui32NumBytes;
-//            }
-//    }
-
-
+//    start_send_to_pc = 0;
 }
 
 void init_zero()
 {
     int k = 0;
-    for(k = 0; k < 2048; k++)
+//    for(k = 0; k < 6144; k++)
+//    {
+//        data_in[k] = 0;
+//    }
+    for(k = 0; k < 6144;k++)
     {
-        data_in[k] = 0;
+        rx_temp_data[k] = 0;
     }
+    for(k = 0; k < 256; k++)
+    {
+        final_buff[k] = 0x41;
+    }
+
+    data_in_ptr = 0;
+    rx_temp_data_ptr = 0;
+    save_start = 0;
+    final_buff_ptr = 5;
+    offset = 0;
+    int j1 =0;
+    for(j1 = 0; j1 < 8; j1++)
+    {
+//        data_in[data_in_ptr++] = 1;
+        rx_temp_data[rx_temp_data_ptr++] = 0;
+    }
+    see_bit_counter = 0;
+    see_bit[0] = 0;
+    see_bit[1] = 0;
+    see_bit[2] = 0;
+    see_bit[3] = 0;
+    see_bit_start = 0;
+    rx_counter = 0;
+    first_start = 0;
+    sv_st_tmp = 0;
+    f_read_index = 0;
+    start_send_to_pc = 1;
 }
 
-void demod()
-{
-    if (see_bit[0] == 0 && see_bit[1] == 1)
-    {
-        data_in[data_in_ptr/2] = 0;
-    }
-    else if (see_bit[0] == 1 && see_bit[1] == 0)
-    {
-       data_in[data_in_ptr/2] = 1;
-    }
-    else
-    {
-        data_in[data_in_ptr/2] = 2;
-    }
-}
 
 void gpiob_interrupt_handler()
 {
     GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_0);
-//    data_in[counter] =
-    data_in[data_in_ptr] = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_1);
-//    data_in[counter] = data_in[counter] >> 1;
+//    data_in[data_in_ptr] =
+    uint8_t dat;
+    uint8_t dat_1;
+//    dat= GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_1);
+    dat = GPIOPinRead(GPIO_PORTC_BASE,0xff);
+    dat_1 = (dat&0xf0) >> 4;
 
-    if(data_in_ptr > 2000)
+//
+    if (dat_1 == 3 && see_bit_start == 0 && sv_st_tmp == 0)
     {
-        send_to_pc();
-    }
+        see_bit[0] = 3;
+        see_bit_counter = 0;
 
-    if (data_in_ptr % 2 == 1)
-    {
-        see_bit[1] = GPIOPinRead(GPIO_PORTB_BASE,GPIO_PIN_1);
-        see_bit[1] = see_bit[1] >>1;
-        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0x01 );
-//        demod();
     }
+    if(see_bit_counter == 4 && dat_1 == 4 && see_bit[0] == 3 && sv_st_tmp == 0)
+    {
+        see_bit[1] = 4;
+        see_bit_counter = 0;
+        save_start = 1;
+        rx_counter = 0;
+        first_start = rx_temp_data_ptr;
+        sv_st_tmp = 1;
+    }
+//    else if(see_bit_counter == 4 && dat_1 == 4 && see_bit[0] == 3 && sv_st_tmp == 0)
+//    {
+//        see_bit[1] = 4;
+//        see_bit_counter++;
+//    }
+//    else if(see_bit_counter == 8 && dat_1 == 4 && see_bit[0] == 3 && see_bit[1] == 4 && sv_st_tmp == 0)
+//    {
+//        see_bit[2] = 4;
+//        see_bit_counter++;
+//    }
+//    if(see_bit_counter == 12 && dat_1 == 4 && see_bit[0] == 3 && see_bit[1] == 4 &&  see_bit[2] == 4 && sv_st_tmp == 0)
+//    {
+//                see_bit[3] = 4;
+//                see_bit_counter = 0;
+//                save_start = 1;
+//                rx_counter = 0;
+//                first_start = rx_temp_data_ptr;
+//                sv_st_tmp = 1;
+//    }
     else
     {
-        see_bit[0] = GPIOPinRead(GPIO_PORTB_BASE,GPIO_PIN_1);
-        see_bit[0] = see_bit[0] >>1;
-        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1,0x00);
+        see_bit_counter++;
+        see_bit_start = 0;
     }
-    data_in_ptr = data_in_ptr + 1;
+    rx_temp_data[rx_temp_data_ptr++] = dat_1;
+
+    if(save_start == 1)
+    {
+        if(rx_counter != 0 && rx_counter % 4 == 0 && rx_counter%8 == 0)
+        {
+            final_buff[final_buff_ptr] += (dat &0xf0);
+
+            if(final_buff[final_buff_ptr] == 'D' && final_buff[final_buff_ptr - 1] == 'N' && final_buff[final_buff_ptr-2] == 'E')
+            {
+                GPIOIntDisable(GPIO_PORTB_BASE, GPIO_PIN_0);
+//                usb_main();
+                start_send_to_pc = 1;
+            }
+            final_buff_ptr++;
+        }
+        else if(rx_counter%4  == 0 && rx_counter%8 == 4)
+        {
+            final_buff[final_buff_ptr] += (dat&0xf0) >> 4;
+
+        }
+        rx_counter++;
+
+    }
+//    int shift = data_in_ptr % 8;
+//    if(data_in[data_in_ptr] == 1 && data_in[data_in_ptr- 1] == 1 && data_in[data_in_ptr-2] == 0 && data_in[data_in_ptr-3] == 0 &&
+//            data_in[data_in_ptr-4] == 0 && data_in[data_in_ptr-5] == 0 && data_in[data_in_ptr-6] == 1 && data_in[data_in_ptr-7] == 0)
+//    {
+//        save_start = 1;
+//        offset = data_in_ptr%8;
+//    }
+
+
+//    if(save_start == 1 && shift != 0)
+//    {
+//        rx_temp_data[rx_temp_data_ptr] +=  (dat >> 1) << shift;
+//    }
+//    else if (save_start == 1)
+//    {
+//        final_buff[final_buff_ptr++] = rx_temp_data[rx_temp_data_ptr++] ;
+//    }
+//    else
+//    {
+//        if(data_in[data_in_ptr] == 0 && data_in[data_in_ptr- 1] == 1 && data_in[data_in_ptr-2] == 0 && data_in[data_in_ptr-3] == 0 &&
+//                data_in[data_in_ptr-4] == 0 && data_in[data_in_ptr-5] == 0 && data_in[data_in_ptr-6] == 1 && data_in[data_in_ptr-7] == 0)
+//        {
+//            save_start = 1;
+//            offset = data_in_ptr%8;
+//        }
+//    }
+
+//        if(rx_temp_data[rx_temp_data_ptr] == 'C')
+//        {
+//            save_start = 1;
+//        }
+////        rx_temp_data_ptr = 0;
+//        rx_temp_data_ptr++;
+//    }
+
+//    data_in_ptr++;
+//    if(data_in_ptr == 6144)
+//    {
+//        data_in_ptr = 6143;
+//    }
+//    if(rx_temp_data_ptr == 1024)
+//    {
+//        rx_temp_data_ptr = 0;
+//        rx_counter = 0;
+//    }
+    if(rx_counter == 1024)
+    {
+        rx_counter = 0;
+    }
+    if(rx_temp_data_ptr == 6144)
+    {
+        rx_temp_data_ptr = 0;
+    }
+
+
 }
 
 //void gpioc_interrupt_handler()
@@ -199,19 +293,20 @@ void config_timer()
 void config_GPIO()
 {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
-//    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+
     GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1);
     //PIN 0 : External Clock
     //Pin 1 : Data from the PLL
     GPIOPinTypeGPIOInput(GPIO_PORTB_BASE, GPIO_PIN_0|GPIO_PIN_1);
-//    GPIOPinTypeGPIOInput(GPIO_PORTC_BASE, GPIO_PIN_4);
-    GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_3|GPIO_PIN_4);
+    GPIOPinTypeGPIOInput(GPIO_PORTC_BASE, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7);
+//    GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, GPIO_PIN_3|GPIO_PIN_4);
     GPIOIntDisable(GPIO_PORTB_BASE, GPIO_PIN_0);
     GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_0);
     GPIOIntRegister(GPIO_PORTB_BASE,gpiob_interrupt_handler);
-//    GPIOIntTypeSet(GPIO_PORTB_BASE,GPIO_PIN_0,GPIO_RISING_EDGE);
-    GPIOIntTypeSet(GPIO_PORTB_BASE,GPIO_PIN_0,GPIO_FALLING_EDGE);
+    GPIOIntTypeSet(GPIO_PORTB_BASE,GPIO_PIN_0,GPIO_RISING_EDGE);
+//    GPIOIntTypeSet(GPIO_PORTB_BASE,GPIO_PIN_0,GPIO_FALLING_EDGE);
 
     GPIOIntEnable(GPIO_PORTB_BASE,GPIO_PIN_0);
 
@@ -221,7 +316,5 @@ void config_GPIO()
 //    GPIOIntTypeSet(GPIO_PORTC_BASE,GPIO_PIN_4,GPIO_FALLING_EDGE);
 //    GPIOIntEnable(GPIO_PORTC_BASE,GPIO_PIN_4);
 //    IntMasterEnable();
-    data_in_ptr = 0;
 
 }
-

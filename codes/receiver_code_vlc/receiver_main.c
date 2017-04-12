@@ -40,6 +40,8 @@ uint8_t byte_test = 0b11001010;
 
 extern void init_zero();
 
+
+
 int main()
  {
     SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
@@ -59,8 +61,9 @@ int main()
 
 
     IntMasterEnable();
-
+//    uart_rx();
     while(1)
     {
+//        uart_rx()
     }
 }

@@ -34,8 +34,8 @@
 //float freq = 50;
 
 int data_buff_size = 2048;
-bool data_to_tx[6144];
-bool synch_buffer[4096];
+bool data_to_tx[23000];
+//bool synch_buffer[4096];
 int sync_tx_front = 0;
 int sync_tx_back = 0;
 int tx_front = 0;
@@ -83,7 +83,8 @@ void config_timer()
 {
 //    int max_clock_count = 100000;
 //    uint32_t time_period = SysCtlClockGet()/(2*max_clock_count);
-    uint32_t  time_period = 250;
+    uint32_t  time_period = 250; //250 gives 100khz
+
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0); // Enable Timer 0 Clock
     TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC); // Configure Timer Operation as Periodic
@@ -104,7 +105,7 @@ void timer0_interrrupt_handler()
     GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_0, data_to_tx[tx_back++]);
     if (tx_back == tx_front)
     {
-        tx_back = 4000;
+        tx_back = 0;
 //        TimerIntDisable(TIMER0_BASE,TIMER_TIMA_TIMEOUT);
     }
 
@@ -175,33 +176,33 @@ void tx_byte_no_encoding(uint8_t byte)
     }
 }
 
-void send_sync_data(int n)
-{
-    uint8_t pin_n = 1<<n;
-    while(sync_tx_back < sync_tx_front)
-    {
-        bool ab = synch_buffer[sync_tx_back++];
-        GPIOPinWrite(GPIO_PORTB_BASE, pin_n, ab << n);
-//        tx_back = (tx_back)%data_buff_size;
-        SysCtlDelay(cl_delay);
-//        tx_back = tx_back%tx_front;
-        if(sync_tx_back == sync_tx_front)
-        {
-            sync_tx_back = 0;
-        }
-     }
-}
+//void send_sync_data(int n)
+//{
+//    uint8_t pin_n = 1<<n;
+//    while(sync_tx_back < sync_tx_front)
+//    {
+//        bool ab = synch_buffer[sync_tx_back++];
+//        GPIOPinWrite(GPIO_PORTB_BASE, pin_n, ab << n);
+////        tx_back = (tx_back)%data_buff_size;
+//        SysCtlDelay(cl_delay);
+////        tx_back = tx_back%tx_front;
+//        if(sync_tx_back == sync_tx_front)
+//        {
+//            sync_tx_back = 0;
+//        }
+//     }
+//}
 
-void tx_to_synch_buffer(uint8_t byte)
-{
-    int j = 0;
-    for(j = 0; j < 8; j++)
-    {
-//        uint8_t a = byte;
-        synch_buffer[sync_tx_front++] = (byte >> j)&(0x01);
-        synch_buffer[sync_tx_front++] = !((byte >> j)&(0x01));
-    }
-}
+//void tx_to_synch_buffer(uint8_t byte)
+//{
+//    int j = 0;
+//    for(j = 0; j < 8; j++)
+//    {
+////        uint8_t a = byte;
+//        synch_buffer[sync_tx_front++] = (byte >> j)&(0x01);
+//        synch_buffer[sync_tx_front++] = !((byte >> j)&(0x01));
+//    }
+//}
 
 void tx_bits(uint8_t byte)
 {
@@ -224,115 +225,115 @@ void send_sentence(char* sent, int n)
     }
 }
 
-
-int not_main()
- {
-    SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
-//    config_timer();
-    config_GPIO();
-    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE,GPIO_PIN_2 | GPIO_PIN_3);
-//    int count = 0;
-//    int data_count = 0;
-//    int t_i = 100000;
-    int t_j = 1;
-
-//    TimerEnable(TIMER0_BASE, TIMER_A);
-//    TimerEnable(TIMER1_BASE,TIMER_A);
-//    uint8_t bro_ka_byte = 0b10101010;
-//    bool dat_bit = 0;
-    t_j = 0;
-    while(t_j < 500)
-    {
-        data_to_tx[tx_front++] = (t_j++)%2;
-    }
-    t_j = 0;
-
-    while(t_j < n_bits_tx)
-    {
-        data_to_tx[tx_front++] = 1;
-        data_to_tx[tx_front++] = 0;
-        data_to_tx[tx_front++] = 1;
-        data_to_tx[tx_front++] = 0;
-        data_to_tx[tx_front++] = 0;
-        data_to_tx[tx_front++] = 1;
-        data_to_tx[tx_front++] = 1;
-        data_to_tx[tx_front++] = 0;
-        data_to_tx[tx_front++] = 0;
-        data_to_tx[tx_front++] = 1;
-        data_to_tx[tx_front++] = 1;
-        data_to_tx[tx_front++] = 0;
-        data_to_tx[tx_front++] = 1;
-        data_to_tx[tx_front++] = 0;
-        data_to_tx[tx_front++] = 0;
-        data_to_tx[tx_front++] = 1;
-        data_to_tx[tx_front++] = 0;
-        data_to_tx[tx_front++] = 1;
-        data_to_tx[tx_front++] = 1;
-        data_to_tx[tx_front++] = 0;
-        t_j++;
-    }
-
-//    while(t_j)
-//    {
-//        while(t_i)
 //
-//        {
-//            int j;
-//            for(j = 0; j < 8;j++)
-//            {
-//        //            dat_bit = (byte >> j) & 0x01;
-//                GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_3, ((bro_ka_byte >> j) & 0x01) << 3);
-//                SysCtlDelay(test_cl);
-//            }
-//            t_i--;
-////            SysCtlDelay(cl_delay);
-//        }
-//        t_j--;
+//int not_main()
+// {
+//    SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
+////    config_timer();
+//    config_GPIO();
+//    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE,GPIO_PIN_2 | GPIO_PIN_3);
+////    int count = 0;
+////    int data_count = 0;
+////    int t_i = 100000;
+//    int t_j = 1;
+//
+////    TimerEnable(TIMER0_BASE, TIMER_A);
+////    TimerEnable(TIMER1_BASE,TIMER_A);
+////    uint8_t bro_ka_byte = 0b10101010;
+////    bool dat_bit = 0;
+//    t_j = 0;
+//    while(t_j < 500)
+//    {
+//        data_to_tx[tx_front++] = (t_j++)%2;
 //    }
-
-
-
-//    IntMasterEnable();
-
-    while(1)
-    {
-//        int j;
-//        for(j = 0; j < 8;j++)
-//        {
-//    //            dat_bit = (byte >> j) & 0x01;
-//            GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_3, ((byte_test >> j) & 0x01) << 3);
-//            SysCtlDelay(test_cl);
-//        }
-
-//        tx_bits(0);
-//        tx_bits(1);
-
-//        tx_byte(0b10101010);
-        send_data(3);
-//        tx_bits(0b11001010);
-
-//        bool dat_bit;
-//        byte = 0b11001010;
-//        int j;
-//        for(j = 0; j < 8;j++)
-//        {
-////            dat_bit = (byte >> j) & 0x01;
-//            GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_3, ((byte >> j) & 0x01) << 3);
-//            SysCtlDelay(190);
-//        }
-
-
-//        tx_byte(0b10101010);
-//        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_3, dat_bit << 3);
-//        dat_bit = !dat_bit;
-//        SysCtlDelay(190);
-//        tx_byte(0b10101001);
-//        tx_byte(0b11001010);
-//        tx2_byte(0b1110001011001010);
-//        tx_byte(0b11111111);
+//    t_j = 0;
+//
+//    while(t_j < n_bits_tx)
+//    {
+//        data_to_tx[tx_front++] = 1;
+//        data_to_tx[tx_front++] = 0;
+//        data_to_tx[tx_front++] = 1;
+//        data_to_tx[tx_front++] = 0;
+//        data_to_tx[tx_front++] = 0;
+//        data_to_tx[tx_front++] = 1;
+//        data_to_tx[tx_front++] = 1;
+//        data_to_tx[tx_front++] = 0;
+//        data_to_tx[tx_front++] = 0;
+//        data_to_tx[tx_front++] = 1;
+//        data_to_tx[tx_front++] = 1;
+//        data_to_tx[tx_front++] = 0;
+//        data_to_tx[tx_front++] = 1;
+//        data_to_tx[tx_front++] = 0;
+//        data_to_tx[tx_front++] = 0;
+//        data_to_tx[tx_front++] = 1;
+//        data_to_tx[tx_front++] = 0;
+//        data_to_tx[tx_front++] = 1;
+//        data_to_tx[tx_front++] = 1;
+//        data_to_tx[tx_front++] = 0;
+//        t_j++;
+//    }
+//
+////    while(t_j)
+////    {
+////        while(t_i)
+////
+////        {
+////            int j;
+////            for(j = 0; j < 8;j++)
+////            {
+////        //            dat_bit = (byte >> j) & 0x01;
+////                GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_3, ((bro_ka_byte >> j) & 0x01) << 3);
+////                SysCtlDelay(test_cl);
+////            }
+////            t_i--;
+//////            SysCtlDelay(cl_delay);
+////        }
+////        t_j--;
+////    }
+//
+//
+//
+////    IntMasterEnable();
+//
+//    while(1)
+//    {
+////        int j;
+////        for(j = 0; j < 8;j++)
+////        {
+////    //            dat_bit = (byte >> j) & 0x01;
+////            GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_3, ((byte_test >> j) & 0x01) << 3);
+////            SysCtlDelay(test_cl);
+////        }
+//
+////        tx_bits(0);
+////        tx_bits(1);
+//
+////        tx_byte(0b10101010);
 //        send_data(3);
-//        tx_byte(0b01010101);
-//        SysCtlDelay(20000);
-//        send_data(3);
-    }
-}
+////        tx_bits(0b11001010);
+//
+////        bool dat_bit;
+////        byte = 0b11001010;
+////        int j;
+////        for(j = 0; j < 8;j++)
+////        {
+//////            dat_bit = (byte >> j) & 0x01;
+////            GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_3, ((byte >> j) & 0x01) << 3);
+////            SysCtlDelay(190);
+////        }
+//
+//
+////        tx_byte(0b10101010);
+////        GPIOPinWrite(GPIO_PORTB_BASE, GPIO_PIN_3, dat_bit << 3);
+////        dat_bit = !dat_bit;
+////        SysCtlDelay(190);
+////        tx_byte(0b10101001);
+////        tx_byte(0b11001010);
+////        tx2_byte(0b1110001011001010);
+////        tx_byte(0b11111111);
+////        send_data(3);
+////        tx_byte(0b01010101);
+////        SysCtlDelay(20000);
+////        send_data(3);
+//    }
+//}

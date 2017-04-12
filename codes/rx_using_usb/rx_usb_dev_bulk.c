@@ -35,13 +35,11 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/systick.h"
 #include "driverlib/timer.h"
-#include "driverlib/uart.h"
 #include "driverlib/rom.h"
 #include "usblib/usblib.h"
 #include "usblib/usb-ids.h"
 #include "usblib/device/usbdevice.h"
 #include "usblib/device/usbdbulk.h"
-#include "utils/uartstdio.h"
 #include "utils/ustdlib.h"
 #include "usb_bulk_structs.h"
 
@@ -120,7 +118,7 @@ uint32_t g_ui32UARTRxErrors = 0;
 // Map all debug print calls to UARTprintf in debug builds.
 //
 //*****************************************************************************
-#define DEBUG_PRINT UARTprintf
+//#define DEBUG_PRINT UARTprintf
 
 #else
 
@@ -129,7 +127,7 @@ uint32_t g_ui32UARTRxErrors = 0;
 // Compile out all debug print calls in release builds.
 //
 //*****************************************************************************
-#define DEBUG_PRINT while(0) ((int (*)(char *, ...))0)
+//#define DEBUG_PRINT while(0) ((int (*)(char *, ...))0)
 #endif
 
 //*****************************************************************************
@@ -154,16 +152,16 @@ static volatile bool g_bUSBConfigured = false;
 // The error routine that is called if the driver library encounters an error.
 //
 //*****************************************************************************
-#ifdef DEBUG
-void
-__error__(char *pcFilename, uint32_t ui32Line)
-{
-    UARTprintf("Error at line %d of %s\n", ui32Line, pcFilename);
-    while(1)
-    {
-    }
-}
-#endif
+//#ifdef DEBUG
+//void
+//__error__(char *pcFilename, uint32_t ui32Line)
+//{
+//    UARTprintf("Error at line %d of %s\n", ui32Line, pcFilename);
+//    while(1)
+//    {
+//    }
+//}
+//#endif
 
 //*****************************************************************************
 //
@@ -232,7 +230,7 @@ NayaData(tUSBDBulkDevice *psDevice, uint8_t *pui8Data,
     //
     // Dump a debug message.
     //
-    DEBUG_PRINT("Received %d bytes\n", ui32NumBytes);
+//    DEBUG_PRINT("Received %d bytes\n", ui32NumBytes);
 
     //
     // Set up to process the characters by directly accessing the USB buffers.
@@ -318,7 +316,7 @@ TxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,
     //
     // Dump a debug message.
     //
-    DEBUG_PRINT("TX complete %d\n", ui32MsgValue);
+//    DEBUG_PRINT("TX complete %d\n", ui32MsgValue);
 
     return(0);
 }
@@ -355,7 +353,7 @@ RxHandler(void *pvCBData, uint32_t ui32Event,
         case USB_EVENT_CONNECTED:
         {
             g_bUSBConfigured = true;
-            UARTprintf("Host connected.\n");
+//            UARTprintf("Host connected.\n");
 
             //
             // Flush our buffers.
@@ -372,7 +370,7 @@ RxHandler(void *pvCBData, uint32_t ui32Event,
         case USB_EVENT_DISCONNECTED:
         {
             g_bUSBConfigured = false;
-            UARTprintf("Host disconnected.\n");
+//            UARTprintf("Host disconnected.\n");
             break;
         }
 
@@ -423,42 +421,13 @@ RxHandler(void *pvCBData, uint32_t ui32Event,
 // Configure the UART and its pins.  This must be called before UARTprintf().
 //
 //*****************************************************************************
-void
-ConfigureUART(void)
-{
-    //
-    // Enable the GPIO Peripheral used by the UART.
-    //
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-
-    //
-    // Enable UART0
-    //
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-
-    //
-    // Configure GPIO Pins for UART mode.
-    //
-    ROM_GPIOPinConfigure(GPIO_PA0_U0RX);
-    ROM_GPIOPinConfigure(GPIO_PA1_U0TX);
-    ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-
-    //
-    // Use the internal 16MHz oscillator as the UART clock source.
-    //
-    UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
-
-    //
-    // Initialize the UART for console I/O.
-    //
-    UARTStdioConfig(0, 115200, 16000000);
-}
 
 //*****************************************************************************
 //
 // This is the main application entry function.
 //
 //*****************************************************************************
+
 int
 main(void)
 {
@@ -477,30 +446,21 @@ main(void)
     //
     // Set the clocking to run from the PLL at 50MHz
     //
-    ROM_SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN |
-                       SYSCTL_XTAL_16MHZ);
+//    ROM_SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN |
+//                       SYSCTL_XTAL_16MHZ);
 
     //
     // Enable the GPIO port that is used for the on-board LED.
     //
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
+//    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+//    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
     //
     // Enable the GPIO pins for the LED (PF2 & PF3).
     //
-    ROM_GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_3 | GPIO_PIN_2);
-    ROM_GPIOPinTypeGPIOOutput(GPIO_PORTB_BASE, 0xff);
+//    ROM_GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_3 | GPIO_PIN_2);
 //    ROM_GPIOPinTypeGPIOOutput()
 
-    //
-    // Open UART0 and show the application name on the UART.
-    //
-//    ConfigureUART();
 
-    UARTprintf("\033[2JTiva C Series USB bulk device example\n");
-    UARTprintf("---------------------------------\n\n");
-
-    //
     // Not configured initially.
     //What is this????
     g_bUSBConfigured = false;
@@ -522,7 +482,6 @@ main(void)
     //
     // Tell the user what we are up to.
     //
-    //UARTprintf("Configuring USB\n");
 
     //
     // Initialize the transmit and receive buffers.
@@ -544,7 +503,6 @@ main(void)
     //
     // Wait for initial configuration to complete.
     //
-    //UARTprintf("Waiting for host...\n");
 
     //
     // Clear our local byte counters.
@@ -558,74 +516,78 @@ main(void)
     init_rx();
     while(1)
     {
-        send_to_pc();
-
-        //
-        // See if any data has been transferred.
-        //
-
-        if((ui32TxCount != g_ui32TxCount) || (ui32RxCount != g_ui32RxCount))
-        {
-            //
-            // Has there been any transmit traffic since we last checked?
-            //
-            if(ui32TxCount != g_ui32TxCount)
-            {
-                //
-                // Turn on the Green LED.
-                //
-                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, GPIO_PIN_3);
-
-                //
-                // Delay for a bit.
-                //
-                for(ui32Loop = 0; ui32Loop < 150000; ui32Loop++)
-                {
-                }
-
-                //
-                // Turn off the Green LED.
-                //
-                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, 0);
-
-                //
-                // Take a snapshot of the latest transmit count.
-                //
-                ui32TxCount = g_ui32TxCount;
-            }
-
-            //
-            // Has there been any receive traffic since we last checked?
-            //
-            if(ui32RxCount != g_ui32RxCount)
-            {
-                //
-                // Turn on the Blue LED.
-                //
-                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, GPIO_PIN_2);
-
-                //
-                // Delay for a bit.
-                //
-                for(ui32Loop = 0; ui32Loop < 150000; ui32Loop++)
-                {
-                }
-
-                //
-                // Turn off the Blue LED.
-                //
-                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, 0);
-
-                //
-                // Take a snapshot of the latest receive count.
-                //
-                ui32RxCount = g_ui32RxCount;
-            }
-
-            //
-            // Update the display of bytes transferred.
-            //
-            //UARTprintf("\rTx: %d  Rx: %d", ui32TxCount, ui32RxCount);
-        }
+//        send_to_pc();
     }
+//    while(1)
+//    {
+//        send_to_pc();
+//
+//        //
+//        // See if any data has been transferred.
+//        //
+//
+//        if((ui32TxCount != g_ui32TxCount) || (ui32RxCount != g_ui32RxCount))
+//        {
+//            //
+//            // Has there been any transmit traffic since we last checked?
+//            //
+//            if(ui32TxCount != g_ui32TxCount)
+//            {
+//                //
+//                // Turn on the Green LED.
+//                //
+//                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, GPIO_PIN_3);
+//
+//                //
+//                // Delay for a bit.
+//                //
+//                for(ui32Loop = 0; ui32Loop < 150000; ui32Loop++)
+//                {
+//                }
+//
+//                //
+//                // Turn off the Green LED.
+//                //
+//                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, 0);
+//
+//                //
+//                // Take a snapshot of the latest transmit count.
+//                //
+//                ui32TxCount = g_ui32TxCount;
+//            }
+//
+//            //
+//            // Has there been any receive traffic since we last checked?
+//            //
+//            if(ui32RxCount != g_ui32RxCount)
+//            {
+//                //
+//                // Turn on the Blue LED.
+//                //
+//                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, GPIO_PIN_2);
+//
+//                //
+//                // Delay for a bit.
+//                //
+//                for(ui32Loop = 0; ui32Loop < 150000; ui32Loop++)
+//                {
+//                }
+//
+//                //
+//                // Turn off the Blue LED.
+//                //
+//                GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, 0);
+//
+//                //
+//                // Take a snapshot of the latest receive count.
+//                //
+//                ui32RxCount = g_ui32RxCount;
+//            }
+//
+//            //
+//            // Update the display of bytes transferred.
+//            //
+//        }
+//    }
+        return 1;
 }

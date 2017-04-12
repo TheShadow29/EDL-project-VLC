@@ -578,12 +578,12 @@ int main(void)
 //    data_to_tx[tx_front++] = 1;
 
     int t_j = 250;
-        while(t_j)
-        {
-//            tx_to_synch_buffer(0x00);
-            tx_byte(0x00);
-            t_j--;
-        }
+//        while(t_j)
+//        {
+////            tx_to_synch_buffer(0x00);
+//            tx_byte(0x00);
+//            t_j--;
+//        }
 //        t_j = 24;
         t_j = 1;
         while(t_j)
@@ -592,7 +592,7 @@ int main(void)
 //            tx_byte(0b10011100);
 //            tx_byte(0x00);
             tx_byte('C');
-            send_sentence("Hello\n",6);
+//            send_sentence("Hello\n",6);
             send_file();
             send_sentence("END",3);
 //            tx_byte('D');
