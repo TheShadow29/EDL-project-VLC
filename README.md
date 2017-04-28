@@ -8,4 +8,4 @@
   + Then the actual file.
   + Termination on receiving END.
 * Working Results
-  + Works for upto 318 bytes with only 2 errors. (doesn't work for more number of bytes).
+  + Works for upto 318 bytes with only 2 errors. (doesn't work for arbitrarily large files).
