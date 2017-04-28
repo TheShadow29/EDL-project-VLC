@@ -9,16 +9,15 @@
 %%\usepackage[normalem]{ulem}
 \usepackage{mathtools}
 \usepackage{hyperref}
-% \usepackage{float}
+\usepackage{float}
 % \usepackage{hyperref}
 % \usepackage{titlesec}
 \usepackage{caption}
 \usepackage{subcaption}
-
 %% To do:
 % > Which led used
 %% > Manchester Encoding ?
-%% 
+
 
 \newcommand{\ra}{$\rightarrow$}
 
@@ -90,7 +89,7 @@ The design of project is aimed at establishing a communication link using the vi
 \item The Transmitter Circuit
 \item The Receiver Circuit
 \item The Clock Synchronisation Circuit
-\item The Power Supply
+% \item The Power Supply
 \end{itemize}
 
 The second and the third part together form the hardware at the receiver while the fourth system is essentially added to make the system portable.\\
@@ -296,8 +295,8 @@ The receiver circuits outputs the manchester decoded bits and the clock. This is
   Once everything is received it sends the received data to the PC using USB link.
 \end{enumerate}
 
-\subsection{Power Supply}
-To make this system portable another component has to be designed in addition to the above which is the power supply, one each for the transmitter and the receiver. As per feasibility, a $12 V$ source can be generated using the mains or a $12 V$ battery. Using two such sources a dual power source of $\pm 12 V$ is generated with reference to a common ground which is common across the entire transmitter and the receiver individually. The system also employs the usage of a $\pm 5V$ for all the ICs which is generated independently on either side using a $7805$ IC which converts the $12 V$ to $5 V$. Since all the components are mainly small ICs which have low power requirements, the net current requirement is small and hence can be easily supported by such a system and additional protection needed not be designed or added.
+% \subsection{Power Supply}
+% To make this system portable another component has to be designed in addition to the above which is the power supply, one each for the transmitter and the receiver. As per feasibility, a $12 V$ source can be generated using the mains or a $12 V$ battery. Using two such sources a dual power source of $\pm 12 V$ is generated with reference to a common ground which is common across the entire transmitter and the receiver individually. The system also employs the usage of a $\pm 5V$ for all the ICs which is generated independently on either side using a $7805$ IC which converts the $12 V$ to $5 V$. Since all the components are mainly small ICs which have low power requirements, the net current requirement is small and hence can be easily supported by such a system and additional protection needed not be designed or added.
 
 
 
@@ -313,15 +312,15 @@ The following the specifications of the prototype. It has a detailed explanation
 It is a simple circuit which uses a NAND gate of the SN7440N IC. It is a dual quad-input IC. The input is connected to the power supply by a pull up resistor of $1.5k \Omega$ while the output pin is connected to the positive terminal of the LED by a $220 \Omega $ resistor. A NAND gate was used to drive the circuit primarily for the fact that it has a very low resistance when the output is driven to a low which enables it to easily sink in current and hence not distort the output.
 \begin{figure}[h]
   \centering
-  \includegraphics[scale=0.5]{images/transmitter_sch}
-  \caption{Transmitter Circut PCB}
+  \includegraphics[scale=0.5]{images/transmitter_ckt_diag}
+  \caption{Transmitter Circut PCB, Note : 1.5k connected to 5V}
   \label{fig:tx_circuit}
 \end{figure}
 \subsubsection{The receiver circuit}
 \begin{figure}[h]
   \centering
-  \includegraphics[scale=0.5]{images/receiver_sch}
-  \caption{Receiver Circuit PCB}
+  \includegraphics[scale=0.5]{images/receiver_ckt_diag}
+  \caption{Receiver Circuit PCB. Note : 10K connected to 5V}
   \label{fig:rx_circuit}
 \end{figure}
 The first part of the consists of the photodiode which converts the light falling onto into electrical signals, The requirements of the photodiode was a quick response time, a spectral sensitivity in the visible spectrum and a large radiant sensitive area. The size of the
@@ -439,6 +438,20 @@ Since this is the most complex circuit as a whole, step-by-step testing was unav
   This is perhaps the most common bug in any code. Many a times for no apparent reason the code stops at FaultISR interrupt. This basically happens when the software is stuck in an infinite loop. But most often than not (atleast in our experience) this was not the problem. The culprit was rather the out of array indexing, which basically means we were incorrectly trying to access some an element of an array out of its length. 
 \end{enumerate}
 
+\subsection{Final Product Images}
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.05]{images/diff_pll}
+  \caption{Differentiator and PLL pcb}
+  \label{fig:diff_pll}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=0.05]{images/receiver_box}
+  \caption{Receiver in Box}
+  \label{fig:rx_box}
+\end{figure}
 \section{Chapter 5 : Conclusion and suggestions for future work}
 
 The project was finally completed, almost reaching the intended aims by the end of the semester. The system is fairly robust to ambient light and and provides speeds upto $300$ kbps with negligible bit error rate. A number of constraints in the system are because of the constraint of the hardware used and hence was not able to completely achieve the intended specifications. This project can be developed in future in the following domains:
